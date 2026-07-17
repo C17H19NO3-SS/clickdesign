@@ -8,4 +8,4 @@ services:
       - "80"
     environment:
       - CI_ENVIRONMENT=production
-      - app.baseURL=https://clickdesign.com/
+      - app.baseURL=https://clickdesignstudio.com/
