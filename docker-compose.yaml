@@ -5,7 +5,7 @@ services:
     build: .
     container_name: clickdesign_app
     ports:
-      - "8080:80"
+      - "${APP_PORT:-8180}:80"
     volumes:
       - .:/var/www/html
     environment:
