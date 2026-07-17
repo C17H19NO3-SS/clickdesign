@@ -4,9 +4,8 @@ services:
   app:
     build: .
     container_name: clickdesign_app
-    ports:
-      - "${APP_PORT:-8180}:80"
-    volumes:
-      - .:/var/www/html
+    expose:
+      - "80"
     environment:
-      - CI_ENVIRONMENT=development
+      - CI_ENVIRONMENT=production
+      - app.baseURL=https://clickdesign.com/

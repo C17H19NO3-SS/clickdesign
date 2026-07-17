@@ -23,7 +23,8 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Set directory permissions for CodeIgniter's writable folder
-RUN chown -R www-data:www-data /var/www/html/writable
+RUN chown -R www-data:www-data /var/www/html/writable \
+    && chmod -R 775 /var/www/html/writable
 
 # Expose port 80
 EXPOSE 80
