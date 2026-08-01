@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    && docker-php-ext-install intl opcache zip gd \
+    cron \
+    && docker-php-ext-install intl opcache zip gd mysqli pdo_mysql \
     && a2enmod rewrite
 
 # Update Apache configuration to point to the public directory

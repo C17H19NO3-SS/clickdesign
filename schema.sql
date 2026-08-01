@@ -1,0 +1,357 @@
+-- Yazılım Satış Platformu MySQL Veritabanı Şeması (schema.sql)
+
+CREATE DATABASE IF NOT EXISTS `software_store` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `software_store`;
+
+-- 1. KULLANICILAR & YETKİLENDİRME
+CREATE TABLE IF NOT EXISTS `roles` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(50) NOT NULL UNIQUE,
+  `description` VARCHAR(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `permissions` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL UNIQUE,
+  `description` VARCHAR(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `role_permissions` (
+  `role_id` INT UNSIGNED NOT NULL,
+  `permission_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`role_id`, `permission_id`),
+  FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`permission_id`) REFERENCES `permissions`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(150) NOT NULL UNIQUE,
+  `password_hash` VARCHAR(255) DEFAULT NULL,
+  `role` ENUM('admin', 'customer') NOT NULL DEFAULT 'customer',
+  `avatar` VARCHAR(255) DEFAULT NULL,
+  `two_factor_secret` VARCHAR(255) DEFAULT NULL,
+  `two_factor_enabled` TINYINT(1) NOT NULL DEFAULT 0,
+  `failed_login_attempts` INT NOT NULL DEFAULT 0,
+  `locked_until` TIMESTAMP NULL DEFAULT NULL,
+  `google_id` VARCHAR(100) DEFAULT NULL,
+  `github_id` VARCHAR(100) DEFAULT NULL,
+  `billing_type` ENUM('individual', 'corporate') NOT NULL DEFAULT 'individual',
+  `identity_number` VARCHAR(11) DEFAULT NULL,
+  `tax_office` VARCHAR(100) DEFAULT NULL,
+  `tax_number` VARCHAR(20) DEFAULT NULL,
+  `company_name` VARCHAR(150) DEFAULT NULL,
+  `address` TEXT DEFAULT NULL,
+  `phone` VARCHAR(30) DEFAULT NULL,
+  `kvkk_consent_at` TIMESTAMP NULL DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `user_tokens` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `refresh_token` VARCHAR(255) NOT NULL UNIQUE,
+  `user_agent` VARCHAR(255) DEFAULT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `expires_at` TIMESTAMP NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `email` VARCHAR(150) NOT NULL,
+  `token_hash` VARCHAR(255) NOT NULL UNIQUE,
+  `expires_at` TIMESTAMP NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_password_resets_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 2. KATEGORİLER & ÜRÜNLER
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `parent_id` INT UNSIGNED DEFAULT NULL,
+  `slug` VARCHAR(150) NOT NULL UNIQUE,
+  `name` VARCHAR(150) NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  `icon` VARCHAR(100) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`parent_id`) REFERENCES `categories`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `products` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `category_id` INT UNSIGNED DEFAULT NULL,
+  `title` VARCHAR(200) NOT NULL,
+  `slug` VARCHAR(200) NOT NULL UNIQUE,
+  `summary` TEXT DEFAULT NULL,
+  `description` LONGTEXT DEFAULT NULL,
+  `base_price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `support_extension_price` DECIMAL(10,2) DEFAULT NULL,
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'TRY',
+  `thumbnail` VARCHAR(255) DEFAULT NULL,
+  `demo_url` VARCHAR(255) DEFAULT NULL,
+  `source_code_file` VARCHAR(255) DEFAULT NULL,
+  `supported_platforms` SET('windows', 'linux', 'android') DEFAULT NULL,
+  `security_update_months` INT NOT NULL DEFAULT 6,
+  `seo_meta_title` VARCHAR(255) DEFAULT NULL,
+  `seo_meta_description` TEXT DEFAULT NULL,
+  `sales_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `download_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `product_images` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `product_id` BIGINT UNSIGNED NOT NULL,
+  `image_url` VARCHAR(255) NOT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `product_addons` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `product_id` BIGINT UNSIGNED DEFAULT NULL,
+  `title` VARCHAR(150) NOT NULL,
+  `price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'TRY',
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 3. ÖZEL PROJE TALEPLERİ & MILESTONES
+CREATE TABLE IF NOT EXISTS `custom_projects` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `title` VARCHAR(200) NOT NULL,
+  `brief_description` TEXT NOT NULL,
+  `budget_preference` VARCHAR(100) DEFAULT NULL,
+  `attached_files` JSON DEFAULT NULL,
+  `offered_price` DECIMAL(10,2) DEFAULT NULL,
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'TRY',
+  `status` ENUM('pending_quote', 'quoted', 'approved', 'in_progress', 'completed', 'rejected') NOT NULL DEFAULT 'pending_quote',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `project_milestones` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `project_id` BIGINT UNSIGNED NOT NULL,
+  `title` VARCHAR(150) NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `status` ENUM('pending', 'in_progress', 'completed') NOT NULL DEFAULT 'pending',
+  `completed_at` TIMESTAMP NULL DEFAULT NULL,
+  FOREIGN KEY (`project_id`) REFERENCES `custom_projects`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 4. İNDİRİM KUPONLARI, SİPARİŞLER & ÖDEMELER
+CREATE TABLE IF NOT EXISTS `cart_items` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `product_id` BIGINT UNSIGNED NOT NULL,
+  `addon_ids` JSON DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `coupons` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `code` VARCHAR(50) NOT NULL UNIQUE,
+  `discount_type` ENUM('percentage', 'fixed') NOT NULL DEFAULT 'percentage',
+  `discount_value` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `usage_limit` INT DEFAULT NULL,
+  `per_user_limit` INT NOT NULL DEFAULT 1,
+  `used_count` INT NOT NULL DEFAULT 0,
+  `min_order_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `applicable_product_ids` JSON DEFAULT NULL,
+  `applicable_category_ids` JSON DEFAULT NULL,
+  `starts_at` TIMESTAMP NULL DEFAULT NULL,
+  `expires_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `orders` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `order_number` VARCHAR(50) NOT NULL UNIQUE,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `order_type` ENUM('ready_product', 'custom_project') NOT NULL DEFAULT 'ready_product',
+  `subtotal` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `tax_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `total_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'TRY',
+  `status` ENUM('pending', 'paid', 'cancelled', 'refunded') NOT NULL DEFAULT 'pending',
+  `coupon_id` INT UNSIGNED DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`coupon_id`) REFERENCES `coupons`(`id`) ON DELETE SET NULL,
+  INDEX `idx_orders_user_id` (`user_id`),
+  INDEX `idx_orders_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `order_items` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `order_id` BIGINT UNSIGNED NOT NULL,
+  `product_id` BIGINT UNSIGNED DEFAULT NULL,
+  `custom_project_id` BIGINT UNSIGNED DEFAULT NULL,
+  `addon_ids` JSON DEFAULT NULL,
+  `price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `license_key` VARCHAR(100) DEFAULT NULL UNIQUE,
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`custom_project_id`) REFERENCES `custom_projects`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `payments` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `order_id` BIGINT UNSIGNED NOT NULL,
+  `gateway_plugin` VARCHAR(50) NOT NULL,
+  `transaction_id` VARCHAR(100) DEFAULT NULL,
+  `amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'TRY',
+  `status` ENUM('success', 'failed', 'pending') NOT NULL DEFAULT 'pending',
+  `response_payload` JSON DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 5. İLETİŞİM, YORUMLAR, TİCKETLAR & BİLDİRİMLER
+CREATE TABLE IF NOT EXISTS `contact_messages` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(150) NOT NULL,
+  `subject` VARCHAR(200) DEFAULT NULL,
+  `message` TEXT NOT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `reviews` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `product_id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `rating` TINYINT NOT NULL CHECK (`rating` BETWEEN 1 AND 5),
+  `comment` TEXT NOT NULL,
+  `is_verified_purchase` TINYINT(1) NOT NULL DEFAULT 0,
+  `is_approved` TINYINT(1) NOT NULL DEFAULT 0,
+  `admin_reply` TEXT DEFAULT NULL,
+  `replied_at` TIMESTAMP NULL DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `tickets` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `product_id` BIGINT UNSIGNED DEFAULT NULL,
+  `order_id` BIGINT UNSIGNED DEFAULT NULL,
+  `subject` VARCHAR(200) NOT NULL,
+  `priority` ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
+  `status` ENUM('open', 'answered', 'closed') NOT NULL DEFAULT 'open',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `ticket_replies` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `ticket_id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `message` TEXT NOT NULL,
+  `attachments` JSON DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`ticket_id`) REFERENCES `tickets`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `notifications` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `type` ENUM('order', 'ticket', 'project', 'system') NOT NULL DEFAULT 'system',
+  `title` VARCHAR(150) NOT NULL,
+  `message` TEXT NOT NULL,
+  `action_url` VARCHAR(255) DEFAULT NULL,
+  `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 6. İÇERİK Mimarisi & SİSTEM AYARLARI
+CREATE TABLE IF NOT EXISTS `blog_categories` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(150) NOT NULL,
+  `slug` VARCHAR(150) NOT NULL UNIQUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `blog_posts` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `category_id` INT UNSIGNED DEFAULT NULL,
+  `author_id` BIGINT UNSIGNED DEFAULT NULL,
+  `title` VARCHAR(200) NOT NULL,
+  `slug` VARCHAR(200) NOT NULL UNIQUE,
+  `cover_image` VARCHAR(255) DEFAULT NULL,
+  `content` LONGTEXT NOT NULL,
+  `seo_meta_title` VARCHAR(255) DEFAULT NULL,
+  `seo_meta_description` TEXT DEFAULT NULL,
+  `is_published` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`category_id`) REFERENCES `blog_categories`(`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`author_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `faqs` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `question` VARCHAR(255) NOT NULL,
+  `answer` TEXT NOT NULL,
+  `category` VARCHAR(100) DEFAULT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `changelogs` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `product_id` BIGINT UNSIGNED NOT NULL,
+  `version` VARCHAR(20) NOT NULL,
+  `changes_summary` TEXT NOT NULL,
+  `release_date` DATE NOT NULL,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `system_settings` (
+  `key_name` VARCHAR(100) PRIMARY KEY,
+  `value` TEXT DEFAULT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `exchange_rates` (
+  `currency_code` VARCHAR(3) PRIMARY KEY,
+  `rate_to_try` DECIMAL(10,4) NOT NULL DEFAULT 1.0000,
+  `manual_override_rate` DECIMAL(10,4) DEFAULT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `admin_activity_logs` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `action` VARCHAR(100) NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
