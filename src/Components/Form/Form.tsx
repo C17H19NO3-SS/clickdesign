@@ -19,14 +19,7 @@ export const BrandProjectInquiry = () => {
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-white py-20 lg:py-32 font-sans selection:bg-red-600 selection:text-white">
-      {/* İsteğe bağlı mimari ızgara çizgileri */}
-      <div className="pointer-events-none absolute inset-0 mx-auto max-w-360 px-6 md:px-16 grid grid-cols-6 md:grid-cols-12 border-x border-neutral-100">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="h-full border-r border-neutral-100/80" />
-        ))}
-      </div>
-
+    <section className="relative w-full overflow-hidden py-20 lg:py-32 font-sans selection:bg-red-600 selection:text-white">
       <div className="relative z-10 mx-auto max-w-360 px-6 md:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
           {/* Sol Kolon: Başlık */}

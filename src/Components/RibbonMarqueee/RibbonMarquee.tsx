@@ -24,22 +24,22 @@ const CANVAS_BG_CLASSES: Record<
   { wrapper: string; gridLine: string; showGrid: boolean }
 > = {
   "light-grid": {
-    wrapper: "bg-white",
+    wrapper: "",
     gridLine: "border-r border-black/[0.05]",
     showGrid: true,
   },
   "dark-grid": {
-    wrapper: "bg-[#0B0B0C]",
+    wrapper: "",
     gridLine: "border-r border-white/[0.06]",
     showGrid: true,
   },
   "pure-white": {
-    wrapper: "bg-white",
+    wrapper: "",
     gridLine: "",
     showGrid: false,
   },
   "stark-black": {
-    wrapper: "bg-[#090909]",
+    wrapper: "",
     gridLine: "",
     showGrid: false,
   },
@@ -91,22 +91,6 @@ export const RibbonMarquee: React.FC<RibbonMarqueeProps> = ({
           animation-play-state: paused !important;
         }
       `}</style>
-
-      {/* Subtle Architectural Vertical Grid */}
-      {bgConfig.showGrid && (
-        <div
-          className="absolute inset-0 grid grid-cols-7 pointer-events-none"
-          aria-hidden="true"
-        >
-          <div className={bgConfig.gridLine} />
-          <div className={bgConfig.gridLine} />
-          <div className={bgConfig.gridLine} />
-          <div className={bgConfig.gridLine} />
-          <div className={bgConfig.gridLine} />
-          <div className={bgConfig.gridLine} />
-          <div />
-        </div>
-      )}
 
       {/* Intersecting Angled Ribbon Bands */}
       {activeBands.map((band) => {
