@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@keyframes marquee-scroll-left {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-scroll-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0%, 0, 0);
+  }
+}
+
+.font-display-syne {
+  font-family: "Syne", sans-serif;
+}
+
+.font-sans-clean {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.font-mono-code {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.font-serif-slab {
+  font-family: "Crete Round", Georgia, serif;
+}
+
+.font-script-lobster {
+  font-family: "Lobster Two", cursive;
+  font-style: italic;
+}
+
+.font-script-satisfy {
+  font-family: "Satisfy", cursive;
+}
+
+.font-script-kaushan {
+  font-family: "Kaushan Script", cursive;
+}
+
+.font-slab-heavy {
+  font-family: "Alfa Slab One", serif;
+  letter-spacing: 0.015em;
+}
