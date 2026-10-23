@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router";
+import {
+  AnimatedImage as BaseAnimatedImage,
+  ScrollTopButton,
+  zoomable,
+  LightboxModal,
+  LightboxButton,
+  useDocumentTitle,
+} from "@/Components/ProjectShowcase";
 
 // Project Assets
 import KSKStoreHero from "@/Resources/Projects/KSKStore.svg/KSKStoreHero.svg";
@@ -20,79 +28,10 @@ import KSKStoreCardBall from "@/Resources/Projects/KSKStore.svg/KSKStoreCardBall
 import KSKFlowingRibbon from "@/Components/KSKFlowingRibbon";
 import { ProjectCredits } from "@/Components/ProjectCredits";
 
-interface AnimatedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  wrapperClassName?: string;
-  skeletonClassName?: string;
-}
-
-const AnimatedImage: React.FC<AnimatedImageProps> = ({
-  className = "",
-  wrapperClassName = "",
-  skeletonClassName,
-  onLoad,
-  ...props
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const imgRef = React.useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (imgRef.current && imgRef.current.complete) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.06,
-        rootMargin: "0px 0px -20px 0px",
-      }
-    );
-
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const shouldShow = isLoaded && isInView;
-
-  return (
-    <div
-      ref={containerRef}
-      className={`relative overflow-hidden transition-all duration-1000 ease-out will-change-transform will-change-opacity ${shouldShow
-        ? "opacity-100 translate-y-0 scale-100 filter-none"
-        : "opacity-0 translate-y-6 scale-[0.99] blur-[1px]"
-        } ${wrapperClassName}`}
-    >
-      <div
-        className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${skeletonClassName || "bg-[#F2F2F2]"
-          } ${isLoaded ? "opacity-0" : "opacity-100 animate-pulse"}`}
-      />
-      <img
-        ref={imgRef}
-        onLoad={(e) => {
-          setIsLoaded(true);
-          if (onLoad) onLoad(e);
-        }}
-        className={`w-full h-auto transition-opacity duration-500 ${className}`}
-        {...props}
-      />
-    </div>
-  );
-};
+// Bu sayfanın görsel animasyon ayarları
+const AnimatedImage: React.FC<React.ComponentProps<typeof BaseAnimatedImage>> = (props) => (
+  <BaseAnimatedImage skeletonClassName="bg-[#F2F2F2]" hiddenClassName="opacity-0 translate-y-6 scale-[0.99] blur-[1px]" threshold={0.06} rootMargin="0px 0px -20px 0px" {...props} />
+);
 
 interface GalleryItem {
   src: string;
@@ -184,44 +123,29 @@ const GALLERY_ITEMS: GalleryItem[] = [
 
 export const KSKStore: React.FC = () => {
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  useDocumentTitle("KSK Store - Karşıyaka Spor Kulübü Mağaza & Marka Kimliği | Click Design Studio");
+
+  const closeLightbox = useCallback(() => setSelectedItemIndex(null), []);
+  const showPrev = useCallback(
+    () => setSelectedItemIndex((prev) => (prev !== null ? (prev - 1 + GALLERY_ITEMS.length) % GALLERY_ITEMS.length : null)),
+    []
+  );
+  const showNext = useCallback(
+    () => setSelectedItemIndex((prev) => (prev !== null ? (prev + 1) % GALLERY_ITEMS.length : null)),
+    []
+  );
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.title = "KSK Store - Karşıyaka Spor Kulübü Mağaza & Marka Kimliği | Click Design Studio";
-    }
-
     window.scrollTo(0, 0);
 
-    const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-
+    // Galeride ok tuşlarıyla gezinme (Escape, LightboxModal içinde)
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedItemIndex(null);
-      } else if (e.key === "ArrowLeft") {
-        setSelectedItemIndex((prev) =>
-          prev !== null ? (prev - 1 + GALLERY_ITEMS.length) % GALLERY_ITEMS.length : null
-        );
-      } else if (e.key === "ArrowRight") {
-        setSelectedItemIndex((prev) =>
-          prev !== null ? (prev + 1) % GALLERY_ITEMS.length : null
-        );
-      }
+      if (e.key === "ArrowLeft") showPrev();
+      else if (e.key === "ArrowRight") showNext();
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showPrev, showNext]);
 
   const openLightboxBySrc = (src: string) => {
     const idx = GALLERY_ITEMS.findIndex((item) => item.src === src);
@@ -232,9 +156,6 @@ export const KSKStore: React.FC = () => {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const currentModalItem = selectedItemIndex !== null ? GALLERY_ITEMS[selectedItemIndex] : null;
 
@@ -282,7 +203,7 @@ export const KSKStore: React.FC = () => {
           {/* Section 1: Hero Banner (Crest with glowing aura & red topographic waves) */}
           <header
             id="kskstore-hero-section"
-            onClick={() => openLightboxBySrc(KSKStoreHero)}
+            {...zoomable(() => openLightboxBySrc(KSKStoreHero))}
             className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group relative z-0"
           >
             <h1 className="sr-only">KSK Store - Karşıyaka Spor Kulübü Mağaza ve Marka Kimliği Tasarımı</h1>
@@ -305,7 +226,7 @@ export const KSKStore: React.FC = () => {
             className="w-full max-w-[1440px] relative z-20 h-0 flex justify-center pointer-events-none"
           >
             <div
-              onClick={() => openLightboxBySrc(KSKStoreMain1)}
+              {...zoomable(() => openLightboxBySrc(KSKStoreMain1))}
               className="w-full absolute top-0 -translate-y-[50%] max-w-[1440px] cursor-zoom-in group pointer-events-auto select-none"
               title="Akan KSK Store Şeridi - Yakınlaştırmak için tıklayın"
             >
@@ -317,7 +238,7 @@ export const KSKStore: React.FC = () => {
           <section
             id="kskstore-facade-section"
             aria-label="KSK Store Dış Cephe ve Işıklı Tabela"
-            onClick={() => openLightboxBySrc(KSKStoreMain2)}
+            {...zoomable(() => openLightboxBySrc(KSKStoreMain2))}
             className="w-full max-w-[1440px] relative z-10 flex justify-center cursor-zoom-in group"
           >
             <AnimatedImage
@@ -336,7 +257,7 @@ export const KSKStore: React.FC = () => {
           <section
             id="kskstore-interior-section"
             aria-label="KSK Store Mağaza İçi Perakende Deneyimi"
-            onClick={() => openLightboxBySrc(KSKStoreMain3)}
+            {...zoomable(() => openLightboxBySrc(KSKStoreMain3))}
             className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group relative z-0"
           >
             <AnimatedImage
@@ -356,7 +277,7 @@ export const KSKStore: React.FC = () => {
         <section
           id="kskstore-blueprint-section"
           aria-label="KSK Store Teknik Mimari Çizim ve Pafta"
-          onClick={() => openLightboxBySrc(KSKStoreMain4)}
+          {...zoomable(() => openLightboxBySrc(KSKStoreMain4))}
           className="w-full max-w-[1316px] px-4 sm:px-8 my-8 sm:my-14 md:my-18 flex justify-center cursor-zoom-in group"
         >
           <div className="w-full rounded-[30px] sm:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-[#0F223D]">
@@ -383,7 +304,7 @@ export const KSKStore: React.FC = () => {
             {/* Upper Logo: KSKStoreMain5 */}
             <div
               id="kskstore-main-logo-card"
-              onClick={() => openLightboxBySrc(KSKStoreMain5)}
+              {...zoomable(() => openLightboxBySrc(KSKStoreMain5))}
               className="w-full max-w-[1000px] cursor-zoom-in group py-2 sm:py-6"
               title="Ana Logoyu Büyüt"
             >
@@ -403,7 +324,7 @@ export const KSKStore: React.FC = () => {
               {/* Left Card: Red Background Logo (Protrudes past the bottom container edge) */}
               <div
                 id="kskstore-red-logo-tile"
-                onClick={() => openLightboxBySrc(KSKStoreMain6Red)}
+                {...zoomable(() => openLightboxBySrc(KSKStoreMain6Red))}
                 className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 translate-y-6 sm:translate-y-10 md:translate-y-14 hover:translate-y-4 md:hover:translate-y-8 cursor-zoom-in relative z-10 border border-white/10 group"
                 title="Kırmızı Logo Kartını Büyüt"
               >
@@ -421,7 +342,7 @@ export const KSKStore: React.FC = () => {
               {/* Right Card: White Background Logo (Also protrudes past the bottom container edge symmetrically) */}
               <div
                 id="kskstore-white-logo-tile"
-                onClick={() => openLightboxBySrc(KSKStoreMain6White)}
+                {...zoomable(() => openLightboxBySrc(KSKStoreMain6White))}
                 className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 translate-y-6 sm:translate-y-10 md:translate-y-14 hover:translate-y-4 md:hover:translate-y-8 cursor-zoom-in relative z-10 border border-neutral-200/50 group"
                 title="Beyaz Logo Kartını Büyüt"
               >
@@ -450,7 +371,7 @@ export const KSKStore: React.FC = () => {
             {/* Left Card: KSK Krampon */}
             <div
               id="kskstore-cleat-card"
-              onClick={() => openLightboxBySrc(KSKStoreCardCleat)}
+              {...zoomable(() => openLightboxBySrc(KSKStoreCardCleat))}
               className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 cursor-zoom-in group"
               title="Krampon Vitrinini Büyüt"
             >
@@ -468,7 +389,7 @@ export const KSKStore: React.FC = () => {
             {/* Right Card: Mağaza Girişi */}
             <div
               id="kskstore-entrance-card"
-              onClick={() => openLightboxBySrc(KSKStoreCardEntrance)}
+              {...zoomable(() => openLightboxBySrc(KSKStoreCardEntrance))}
               className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 cursor-zoom-in group"
               title="Mağaza Girişini Büyüt"
             >
@@ -489,7 +410,7 @@ export const KSKStore: React.FC = () => {
         <section
           id="kskstore-scarf-section"
           aria-label="KSK Store Jakarlı Taraftar Atkısı"
-          onClick={() => openLightboxBySrc(KSKStoreMain8)}
+          {...zoomable(() => openLightboxBySrc(KSKStoreMain8))}
           className="w-full max-w-[1295px] px-4 sm:px-8 my-10 sm:my-16 md:my-22 flex justify-center cursor-zoom-in group"
         >
           <div className="w-full rounded-[30px] sm:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-white border border-neutral-100">
@@ -522,96 +443,49 @@ export const KSKStore: React.FC = () => {
 
       {/* Lightbox Modal */}
       {currentModalItem && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={currentModalItem.title}
-          onClick={() => setSelectedItemIndex(null)}
-          className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-5xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-neutral-50">
-              <div className="flex flex-col">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#E11D2A]">
-                  {currentModalItem.category} &bull; {selectedItemIndex! + 1} / {GALLERY_ITEMS.length}
-                </span>
-                <h3 className="text-sm sm:text-base font-semibold text-neutral-800">
-                  {currentModalItem.title}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedItemIndex(
-                      (selectedItemIndex! - 1 + GALLERY_ITEMS.length) % GALLERY_ITEMS.length
-                    )
-                  }
-                  aria-label="Önceki Görsel"
-                  className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer"
-                  title="Önceki (Sol Ok)"
-                >
-                  &larr;
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedItemIndex((selectedItemIndex! + 1) % GALLERY_ITEMS.length)
-                  }
-                  aria-label="Sonraki Görsel"
-                  className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer"
-                  title="Sonraki (Sağ Ok)"
-                >
-                  &rarr;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedItemIndex(null)}
-                  aria-label="Kapat"
-                  className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer ml-1"
-                  title="Kapat (ESC)"
-                >
-                  &times;
-                </button>
-              </div>
+        <LightboxModal label={currentModalItem.title} onClose={closeLightbox} overlayClassName="z-50">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-neutral-50">
+            <div className="flex flex-col">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#E11D2A]">
+                {currentModalItem.category} &bull; {selectedItemIndex! + 1} / {GALLERY_ITEMS.length}
+              </span>
+              <h3 className="text-sm sm:text-base font-semibold text-neutral-800">
+                {currentModalItem.title}
+              </h3>
             </div>
-
-            {/* Modal Body */}
-            <div className="p-4 sm:p-6 overflow-auto max-h-[calc(90vh-120px)] flex items-center justify-center bg-[#FAFAFA]">
-              <img
-                src={currentModalItem.src}
-                alt={currentModalItem.title}
-                className="max-w-full max-h-[70vh] object-contain select-none rounded-lg"
-              />
-            </div>
-
-            {/* Modal Footer Description */}
-            <div className="px-6 py-3 border-t border-neutral-100 bg-neutral-50 flex items-center justify-between text-xs text-neutral-500">
-              <p className="line-clamp-2 pr-4">{currentModalItem.description}</p>
-              <span className="shrink-0 text-neutral-400 hidden sm:inline">Klavye: &larr; &rarr; Ok tuşları &bull; ESC</span>
+            <div className="flex items-center gap-2">
+              <LightboxButton onClick={showPrev} aria-label="Önceki Görsel" title="Önceki (Sol Ok)">
+                &larr;
+              </LightboxButton>
+              <LightboxButton onClick={showNext} aria-label="Sonraki Görsel" title="Sonraki (Sağ Ok)">
+                &rarr;
+              </LightboxButton>
+              <LightboxButton onClick={closeLightbox} aria-label="Kapat" title="Kapat (ESC)" className="ml-1">
+                &times;
+              </LightboxButton>
             </div>
           </div>
-        </div>
+
+          {/* Modal Body */}
+          <div className="p-4 sm:p-6 overflow-auto max-h-[calc(90vh-120px)] flex items-center justify-center bg-[#FAFAFA]">
+            <img
+              src={currentModalItem.src}
+              alt={currentModalItem.title}
+              className="max-w-full max-h-[70vh] object-contain select-none rounded-lg"
+            />
+          </div>
+
+          {/* Modal Footer Description */}
+          <div className="px-6 py-3 border-t border-neutral-100 bg-neutral-50 flex items-center justify-between text-xs text-neutral-500">
+            <p className="line-clamp-2 pr-4">{currentModalItem.description}</p>
+            <span className="shrink-0 text-neutral-400 hidden sm:inline">Klavye: &larr; &rarr; Ok tuşları &bull; ESC</span>
+          </div>
+        </LightboxModal>
       )}
 
       {/* Floating Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          id="scroll-to-top-btn"
-          aria-label="Sayfanın Başına Dön"
-          className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-[#E11D2A] hover:bg-[#C01520] text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
+      <ScrollTopButton colorClassName="bg-[#E11D2A] hover:bg-[#C01520]" />
     </div>
   );
 };

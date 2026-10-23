@@ -76,12 +76,12 @@ export const RibbonMarquee: React.FC<RibbonMarqueeProps> = ({
       activeBands.forEach((band) => {
         // Parse angle in degrees
         const angleMatch = band.angle.match(/([+-]?\d+(?:\.\d+)?)/);
-        const angleDeg = angleMatch ? Math.abs(parseFloat(angleMatch[1])) : 0;
+        const angleDeg = angleMatch?.[1] ? Math.abs(parseFloat(angleMatch[1])) : 0;
         const theta = (angleDeg * Math.PI) / 180;
 
         // Parse vertical position percentage
         const posMatch = band.verticalPos.match(/(\d+(?:\.\d+)?)/);
-        const p = posMatch ? parseFloat(posMatch[1]) / 100 : 0.5;
+        const p = posMatch?.[1] ? parseFloat(posMatch[1]) / 100 : 0.5;
 
         // The lowest point of the angled band on screen [0, width] occurs at the edge:
         // y_bottom = p * H + (width / 2) * tan(theta) + (bandHeight / 2) / cos(theta)

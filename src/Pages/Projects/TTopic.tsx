@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router";
+import { AnimatedImage as BaseAnimatedImage, ScrollTopButton, zoomable, ImageLightbox, useLightbox, useDocumentTitle } from "@/Components/ProjectShowcase";
 import { ProjectCredits } from "@/Components/ProjectCredits";
 
 // Project Assets
@@ -36,78 +37,10 @@ import TTopicMain29 from "@/Resources/Projects/T-Topic.svg/T-TopicMain29.svg";
 import TTopicMain30 from "@/Resources/Projects/T-Topic.svg/T-TopicMain30.svg";
 import TTopicMain31 from "@/Resources/Projects/T-Topic.svg/T-TopicMain31.svg";
 
-interface AnimatedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  wrapperClassName?: string;
-}
-
-const AnimatedImage: React.FC<AnimatedImageProps> = ({
-  className = "",
-  wrapperClassName = "",
-  onLoad,
-  ...props
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const imgRef = React.useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (imgRef.current && imgRef.current.complete) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.08,
-        rootMargin: "0px 0px -40px 0px",
-      }
-    );
-
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const shouldShow = isLoaded && isInView;
-
-  return (
-    <div
-      ref={containerRef}
-      className={`relative transition-all duration-1000 ease-out will-change-transform will-change-opacity ${shouldShow
-        ? "opacity-100 translate-y-0 scale-100 filter-none"
-        : "opacity-0 translate-y-8 scale-[0.97] blur-[2px]"
-        } ${wrapperClassName}`}
-    >
-      {/* Skeleton Shimmer Placeholder */}
-      <div
-        className={`absolute inset-0 bg-[#F9F4F0] transition-opacity duration-700 pointer-events-none ${isLoaded ? "opacity-0" : "opacity-100 animate-pulse"
-          }`}
-      />
-      <img
-        ref={imgRef}
-        {...props}
-        onLoad={(e) => {
-          setIsLoaded(true);
-          onLoad?.(e);
-        }}
-        className={`w-full h-auto transition-opacity duration-500 ${className}`}
-      />
-    </div>
-  );
-};
+// Bu sayfanın görsel animasyon ayarları
+const AnimatedImage: React.FC<React.ComponentProps<typeof BaseAnimatedImage>> = (props) => (
+  <BaseAnimatedImage skeletonClassName="bg-[#F9F4F0]" clip={false} {...props} />
+);
 
 /* Proportional canvas: children are positioned in design-pixel coordinates (w x h) and scale fluidly */
 const CanvasCtx = React.createContext({ w: 1, h: 1 });
@@ -140,7 +73,7 @@ const Tile: React.FC<TileProps> = ({ src, title, alt, onOpen, x = 0, y = 0, w = 
     : { position: "absolute", left: `${(x / c.w) * 100}%`, top: `${(y / c.h) * 100}%`, width: `${(w / c.w) * 100}%`, zIndex: z || undefined };
   return (
     <div
-      onClick={() => onOpen(src, title)}
+      {...zoomable(() => onOpen(src, title))}
       style={style}
       className={`cursor-zoom-in group transition-transform duration-500 ${floating ? "hover:scale-[1.02]" : "hover:scale-[1.015]"}`}
     >
@@ -155,39 +88,8 @@ const Tile: React.FC<TileProps> = ({ src, title, alt, onOpen, x = 0, y = 0, w = 
 };
 
 export const TTopic = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.title = "Ti-Potic (T-Topic) - Bebek Patikleri & Ürün Fotoğrafçılığı | Click Design Studio";
-    }
-
-    const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedImage(null);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const { selectedImage, setSelectedImage, close: closeLightbox } = useLightbox();
+  useDocumentTitle("Ti-Potic (T-Topic) - Bebek Patikleri & Ürün Fotoğrafçılığı | Click Design Studio");
 
   const openModal = (src: string, title: string) => {
     setSelectedImage({ src, title });
@@ -229,7 +131,7 @@ export const TTopic = () => {
         {/* Section 1: Hero Banner */}
         <header
           id="ttopic-hero-section"
-          onClick={() => openModal(TTopicHero, "Ti-Potic - Bebek Patik Koleksiyonu Hero")}
+          {...zoomable(() => openModal(TTopicHero, "Ti-Potic - Bebek Patik Koleksiyonu Hero"))}
           className="w-full max-w-[1440px] flex justify-center bg-[#F3D7CE] cursor-zoom-in group shadow-xs"
         >
           <h1 className="sr-only">Ti-Potic (T-Topic) - Premium Bebek Patikleri & Çocuk Koleksiyonu</h1>
@@ -296,56 +198,10 @@ export const TTopic = () => {
       </main>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={selectedImage.title}
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-5xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-neutral-50">
-              <h3 className="text-sm font-semibold text-neutral-800">
-                {selectedImage.title}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedImage(null)}
-                aria-label="Kapat"
-                className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-4 sm:p-6 overflow-auto max-h-[calc(90vh-70px)] flex items-center justify-center bg-[#FAFAFA]">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.title}
-                className="max-w-full max-h-[75vh] object-contain select-none"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <ImageLightbox image={selectedImage} onClose={closeLightbox} />
 
       {/* Floating Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          id="scroll-to-top-btn"
-          aria-label="Sayfanın Başına Dön"
-          className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-[#2C2623] hover:bg-[#C26B5C] text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
+      <ScrollTopButton colorClassName="bg-[#2C2623] hover:bg-[#C26B5C]" />
     </div>
   );
 };

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router";
+import { AnimatedImage as BaseAnimatedImage, ScrollTopButton, zoomable, ImageLightbox, useLightbox, useDocumentTitle } from "@/Components/ProjectShowcase";
 import { ProjectCredits } from "@/Components/ProjectCredits";
 
 // Project Assets
@@ -13,113 +14,14 @@ import CMDMain5 from "@/Resources/Projects/CMD-Aluminyum/CMDMain5.svg";
 import CMDMain6 from "@/Resources/Projects/CMD-Aluminyum/CMDMain6.svg";
 import CMDMain7 from "@/Resources/Projects/CMD-Aluminyum/CMDMain7.svg";
 
-interface AnimatedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  wrapperClassName?: string;
-}
-
-const AnimatedImage: React.FC<AnimatedImageProps> = ({
-  className = "",
-  wrapperClassName = "",
-  onLoad,
-  ...props
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const imgRef = React.useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (imgRef.current && imgRef.current.complete) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.08,
-        rootMargin: "0px 0px -40px 0px",
-      }
-    );
-
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const shouldShow = isLoaded && isInView;
-
-  return (
-    <div
-      ref={containerRef}
-      className={`relative transition-all duration-1000 ease-out will-change-transform will-change-opacity ${shouldShow
-        ? "opacity-100 translate-y-0 scale-100 filter-none"
-        : "opacity-0 translate-y-8 scale-[0.97] blur-[2px]"
-        } ${wrapperClassName}`}
-    >
-      {/* Skeleton Shimmer Placeholder */}
-      <div
-        className={`absolute inset-0 bg-neutral-200/50 transition-opacity duration-700 pointer-events-none ${isLoaded ? "opacity-0" : "opacity-100 animate-pulse"
-          }`}
-      />
-      <img
-        ref={imgRef}
-        {...props}
-        onLoad={(e) => {
-          setIsLoaded(true);
-          onLoad?.(e);
-        }}
-        className={`w-full h-auto transition-opacity duration-500 ${className}`}
-      />
-    </div>
-  );
-};
+// Bu sayfanın görsel animasyon ayarları
+const AnimatedImage: React.FC<React.ComponentProps<typeof BaseAnimatedImage>> = (props) => (
+  <BaseAnimatedImage skeletonClassName="bg-neutral-200/50" clip={false} {...props} />
+);
 
 export const CMDAluminyum = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.title = "CMD Alüminyum - Kurumsal Kimlik & Marka Tasarımı | Click Design Studio";
-    }
-
-    const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedImage(null);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const { selectedImage, setSelectedImage, close: closeLightbox } = useLightbox();
+  useDocumentTitle("CMD Alüminyum - Kurumsal Kimlik & Marka Tasarımı | Click Design Studio");
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A] flex flex-col items-center selection:bg-[#E30613] selection:text-white">
@@ -157,7 +59,7 @@ export const CMDAluminyum = () => {
         {/* Section 1: Hero Banner (Red & Dark Gradient with Floating Chrome Sphere) */}
         <header
           id="cmd-hero-section"
-          onClick={() => setSelectedImage({ src: CMDHero, title: "CMD Alüminyum - Hero Görseli & Krom Küre" })}
+          {...zoomable(() => setSelectedImage({ src: CMDHero, title: "CMD Alüminyum - Hero Görseli & Krom Küre" }))}
           className="w-full max-w-[1440px] flex justify-center bg-[#1A1A1A] cursor-zoom-in group shadow-xs"
         >
           <h1 className="sr-only">CMD Alüminyum - Kurumsal Kimlik ve Marka Tasarımı</h1>
@@ -180,7 +82,7 @@ export const CMDAluminyum = () => {
         >
           <div
             id="cmd-logo-wrapper"
-            onClick={() => setSelectedImage({ src: CMDLogo, title: "CMD Alüminyum - Logo Tasarımı" })}
+            {...zoomable(() => setSelectedImage({ src: CMDLogo, title: "CMD Alüminyum - Logo Tasarımı" }))}
             className="w-full max-w-[341px] flex justify-center cursor-zoom-in group transition-transform duration-500 hover:scale-[1.03]"
           >
             <AnimatedImage
@@ -203,7 +105,7 @@ export const CMDAluminyum = () => {
         >
           <div
             id="cmd-main1-wrapper"
-            onClick={() => setSelectedImage({ src: CMDMain1, title: "CMD Alüminyum - Kurumsal Kırtasiye ve Kartvizit Seti" })}
+            {...zoomable(() => setSelectedImage({ src: CMDMain1, title: "CMD Alüminyum - Kurumsal Kırtasiye ve Kartvizit Seti" }))}
             className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group"
           >
             <AnimatedImage
@@ -228,7 +130,7 @@ export const CMDAluminyum = () => {
             {/* Left: Red Business Card on Dark Grid Wall (CMDMain2) */}
             <div
               id="cmd-main2-wrapper"
-              onClick={() => setSelectedImage({ src: CMDMain2, title: "CMD Alüminyum - Kırmızı Kurumsal Kartvizit" })}
+              {...zoomable(() => setSelectedImage({ src: CMDMain2, title: "CMD Alüminyum - Kırmızı Kurumsal Kartvizit" }))}
               className="w-[50.8%] ml-[7%] max-w-[731px] mb-[2.3%] cursor-zoom-in group transition-transform duration-500 hover:scale-[1.01]"
             >
               <AnimatedImage
@@ -245,7 +147,7 @@ export const CMDAluminyum = () => {
             {/* Right: 2024 Notebook Agenda & Folder Overlapping Building (CMDMain3) */}
             <div
               id="cmd-main3-wrapper"
-              onClick={() => setSelectedImage({ src: CMDMain3, title: "CMD Alüminyum - 2024 Ajanda ve Sunum Dosyası" })}
+              {...zoomable(() => setSelectedImage({ src: CMDMain3, title: "CMD Alüminyum - 2024 Ajanda ve Sunum Dosyası" }))}
               className="w-[34.3%] mr-[4.3%] max-w-[494px] mt-[5.4%] -mb-[8.6%] relative z-20 cursor-zoom-in group transition-transform duration-500 hover:scale-[1.01]"
             >
               <AnimatedImage
@@ -269,7 +171,7 @@ export const CMDAluminyum = () => {
         >
           <div
             id="cmd-main4-wrapper"
-            onClick={() => setSelectedImage({ src: CMDMain4, title: "CMD Alüminyum - Dış Cephe Tabela Tasarımı" })}
+            {...zoomable(() => setSelectedImage({ src: CMDMain4, title: "CMD Alüminyum - Dış Cephe Tabela Tasarımı" }))}
             className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group"
           >
             <AnimatedImage
@@ -294,7 +196,7 @@ export const CMDAluminyum = () => {
             {/* Left: Red Construction Safety Helmet (CMDMain5) */}
             <div
               id="cmd-main5-wrapper"
-              onClick={() => setSelectedImage({ src: CMDMain5, title: "CMD Alüminyum - İş Güvenliği Bareti" })}
+              {...zoomable(() => setSelectedImage({ src: CMDMain5, title: "CMD Alüminyum - İş Güvenliği Bareti" }))}
               className="w-[58.1%] max-w-[837px] ml-0 mb-[5%] flex justify-start cursor-zoom-in group transition-transform duration-500 hover:scale-[1.02]"
             >
               <AnimatedImage
@@ -311,7 +213,7 @@ export const CMDAluminyum = () => {
             {/* Right: Black & Red Branded Mug Overlapping Catalog Surface (CMDMain6) */}
             <div
               id="cmd-main6-wrapper"
-              onClick={() => setSelectedImage({ src: CMDMain6, title: "CMD Alüminyum - Kurumsal Kupa Tasarımı" })}
+              {...zoomable(() => setSelectedImage({ src: CMDMain6, title: "CMD Alüminyum - Kurumsal Kupa Tasarımı" }))}
               className="w-[43.8%] max-w-[630px] mr-0 mt-[31%] -mb-[11.5%] relative z-20 flex justify-end cursor-zoom-in group transition-transform duration-500 hover:scale-[1.02]"
             >
               <AnimatedImage
@@ -335,7 +237,7 @@ export const CMDAluminyum = () => {
         >
           <div
             id="cmd-main7-wrapper"
-            onClick={() => setSelectedImage({ src: CMDMain7, title: "CMD Alüminyum - Ürün ve Teknik Detay Kataloğu" })}
+            {...zoomable(() => setSelectedImage({ src: CMDMain7, title: "CMD Alüminyum - Ürün ve Teknik Detay Kataloğu" }))}
             className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group"
           >
             <AnimatedImage
@@ -358,56 +260,10 @@ export const CMDAluminyum = () => {
       </main>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={selectedImage.title}
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-5xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-neutral-50">
-              <h3 className="text-sm font-semibold text-neutral-800">
-                {selectedImage.title}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedImage(null)}
-                aria-label="Kapat"
-                className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-4 sm:p-6 overflow-auto max-h-[calc(90vh-70px)] flex items-center justify-center bg-[#FAFAFA]">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.title}
-                className="max-w-full max-h-[75vh] object-contain select-none"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <ImageLightbox image={selectedImage} onClose={closeLightbox} />
 
       {/* Floating Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          id="scroll-to-top-btn"
-          aria-label="Sayfanın Başına Dön"
-          className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-[#E30613] hover:bg-[#BA050F] text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
+      <ScrollTopButton colorClassName="bg-[#E30613] hover:bg-[#BA050F]" />
     </div>
   );
 };

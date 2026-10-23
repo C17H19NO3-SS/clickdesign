@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router";
+import { AnimatedImage as BaseAnimatedImage, ScrollTopButton, zoomable, ImageLightbox, useLightbox, useDocumentTitle } from "@/Components/ProjectShowcase";
 import { ProjectCredits } from "@/Components/ProjectCredits";
 
 // Project Assets
@@ -16,114 +17,18 @@ import TwoShineMain9 from "@/Resources/Projects/TwoShine.svg/TwoShineMain9.svg";
 import TwoShineMain10 from "@/Resources/Projects/TwoShine.svg/TwoShineMain10.svg";
 import TwoShineMainBG1 from "@/Resources/Projects/TwoShine.svg/TwoShineMainBG1.svg";
 
-interface AnimatedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  wrapperClassName?: string;
-}
-
-const AnimatedImage: React.FC<AnimatedImageProps> = ({
-  className = "",
-  wrapperClassName = "",
-  onLoad,
-  ...props
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const imgRef = React.useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (imgRef.current && imgRef.current.complete) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.08,
-        rootMargin: "0px 0px -30px 0px",
-      }
-    );
-
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const shouldShow = isLoaded && isInView;
-
-  return (
-    <div
-      ref={containerRef}
-      className={`relative overflow-hidden transition-all duration-1000 ease-out will-change-transform will-change-opacity ${shouldShow
-        ? "opacity-100 translate-y-0 scale-100 filter-none"
-        : "opacity-0 translate-y-6 scale-[0.98] blur-[1px]"
-        } ${wrapperClassName}`}
-    >
-      <div
-        className={`absolute inset-0 bg-[#F5EDF3] transition-opacity duration-700 pointer-events-none ${isLoaded ? "opacity-0" : "opacity-100 animate-pulse"
-          }`}
-      />
-      <img
-        ref={imgRef}
-        onLoad={(e) => {
-          setIsLoaded(true);
-          if (onLoad) onLoad(e);
-        }}
-        className={`w-full h-auto transition-opacity duration-500 ${className}`}
-        {...props}
-      />
-    </div>
-  );
-};
+// Bu sayfanın görsel animasyon ayarları
+const AnimatedImage: React.FC<React.ComponentProps<typeof BaseAnimatedImage>> = (props) => (
+  <BaseAnimatedImage skeletonClassName="bg-[#F5EDF3]" hiddenClassName="opacity-0 translate-y-6 scale-[0.98] blur-[1px]" rootMargin="0px 0px -30px 0px" {...props} />
+);
 
 export const TwoShine: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  const { selectedImage, setSelectedImage, close: closeLightbox } = useLightbox();
+  useDocumentTitle("TwoShine - Kozmetik & Cilt Bakımı Marka Kimliği | Click Design Studio");
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.title = "TwoShine - Kozmetik & Cilt Bakımı Marka Kimliği | Click Design Studio";
-    }
-
     window.scrollTo(0, 0);
-
-    const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedImage(null);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
   }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-[#1E121A] flex flex-col items-center selection:bg-[#D08BBD] selection:text-white">
@@ -164,12 +69,12 @@ export const TwoShine: React.FC = () => {
         {/* Section 1: Hero Banner (Dark Burgundy/Plum Gradient with centered TwoShine wordmark & sparkle emblem) */}
         <header
           id="twoshine-hero-section"
-          onClick={() =>
+          {...zoomable(() =>
             setSelectedImage({
               src: TwoShineHero,
               title: "TwoShine - Kurumsal Logo & Hero Tasarımı",
             })
-          }
+          )}
           className="w-full max-w-[1440px] flex justify-center bg-[#1D121B] cursor-zoom-in group shadow-xs relative z-0"
         >
           <h1 className="sr-only">TwoShine - Kozmetik ve Cilt Bakımı Marka Kimliği Tasarımı</h1>
@@ -194,12 +99,12 @@ export const TwoShine: React.FC = () => {
             {/* Left Card: TwoShineMain1 (Bottles on Stone Counter) - Overlaps Hero, underneath Arch Card */}
             <div
               id="twoshine-products-card"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain1,
                   title: "TwoShine - Vücut Losyonu ve Yüz Kremi Doğal Taş Sahnesi",
                 })
-              }
+              )}
               className="md:col-span-8 relative z-10 rounded-3xl sm:rounded-4xl md:rounded-[40px] overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-1 cursor-zoom-in"
             >
               <AnimatedImage
@@ -216,12 +121,12 @@ export const TwoShine: React.FC = () => {
             {/* Right Card: TwoShineMain2 (Pink Card with Star/Arch) - Overlaps Left Card on Top (z-20) */}
             <div
               id="twoshine-arch-card"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain2,
                   title: "TwoShine - Amblem & Monogram Kartı",
                 })
-              }
+              )}
               className="md:col-span-4 w-full max-w-[340px] mx-auto md:max-w-none md:mx-0 -mt-6 sm:-mt-10 md:mt-24 lg:mt-32 xl:mt-36 md:-ml-8 lg:-ml-12 xl:-ml-16 relative z-20 rounded-3xl sm:rounded-4xl md:rounded-[40px] overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-1 cursor-zoom-in bg-[#D08BBD]"
             >
               <AnimatedImage
@@ -247,12 +152,12 @@ export const TwoShine: React.FC = () => {
             {/* Floating Cream Texture Swatch (TwoShineMain3) Overlapping Top-Left */}
             <div
               id="twoshine-cream-swatch"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain3,
                   title: "TwoShine - Yoğun Nemlendirici Krem Dokusu Swatch",
                 })
-              }
+              )}
               className="absolute -top-6 -left-2 sm:-top-10 sm:-left-4 md:-top-14 md:-left-6 z-20 w-28 sm:w-44 md:w-56 cursor-zoom-in hover:scale-105 transition-transform duration-300 drop-shadow-xl"
               title="Krem Dokusunu Yakından İncele"
             >
@@ -268,12 +173,12 @@ export const TwoShine: React.FC = () => {
             {/* Gift Box Card (TwoShineMain4) */}
             <div
               id="twoshine-giftbox-card"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain4,
                   title: "TwoShine - Lüks Hediye Kutusu ve Ambalaj Seti",
                 })
-              }
+              )}
               className="w-full rounded-3xl sm:rounded-4xl md:rounded-[40px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 cursor-zoom-in bg-[#CDBAB8]"
             >
               <AnimatedImage
@@ -293,12 +198,12 @@ export const TwoShine: React.FC = () => {
         <section
           id="twoshine-crystal-bottle-section"
           aria-label="TwoShine Kristal Cam Şişe ve Işık Kırılmaları"
-          onClick={() =>
+          {...zoomable(() =>
             setSelectedImage({
               src: TwoShineMain5,
               title: "TwoShine - Kristal Parfüm Şişesi ve Prizmatik Işık Yansımaları",
             })
-          }
+          )}
           className="w-full max-w-[1440px] flex justify-center bg-[#813369] cursor-zoom-in group shadow-xs overflow-hidden"
         >
           <AnimatedImage
@@ -322,12 +227,12 @@ export const TwoShine: React.FC = () => {
             {/* Left: Pump Bottle */}
             <div
               id="twoshine-lotion-bottle"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain6,
                   title: "TwoShine - Vücut Losyonu 100ml Şişe Tasarımı",
                 })
-              }
+              )}
               className="md:col-span-5 flex justify-center items-center cursor-zoom-in hover:scale-[1.02] transition-transform duration-500"
             >
               <AnimatedImage
@@ -344,12 +249,12 @@ export const TwoShine: React.FC = () => {
             {/* Right: 2x3 Icon Matrix */}
             <div
               id="twoshine-icons-matrix"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain7,
                   title: "TwoShine - Marka Renk Paleti ve Amblem Varyasyonları Matrisi",
                 })
-              }
+              )}
               className="md:col-span-7 flex justify-center items-center cursor-zoom-in hover:scale-[1.02] transition-transform duration-500"
             >
               <AnimatedImage
@@ -375,12 +280,12 @@ export const TwoShine: React.FC = () => {
             {/* Left: Model Spraying Mist */}
             <div
               id="twoshine-model-card"
-              onClick={() =>
+              {...zoomable(() =>
                 setSelectedImage({
                   src: TwoShineMain8,
                   title: "TwoShine - Kampanya Görseli: Işıltılı Yüz Spreyi ve Ferahlatıcı Sis",
                 })
-              }
+              )}
               className="md:col-span-8 rounded-3xl sm:rounded-4xl md:rounded-[40px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 cursor-zoom-in bg-[#4F1A3A] flex items-center justify-center"
             >
               <AnimatedImage
@@ -402,12 +307,12 @@ export const TwoShine: React.FC = () => {
               {/* Top Icon: Skincare Dropper & Face */}
               <div
                 id="twoshine-icon-dropper"
-                onClick={() =>
+                {...zoomable(() =>
                   setSelectedImage({
                     src: TwoShineMain9,
                     title: "TwoShine İkonografi - Serum & Damlalık ile Cilt Bakım Rutini",
                   })
-                }
+                )}
                 className="flex-1 flex items-center justify-center p-4 hover:scale-110 transition-transform duration-300 cursor-zoom-in w-full max-w-[220px]"
                 title="Serum İkonunu Büyüt"
               >
@@ -426,12 +331,12 @@ export const TwoShine: React.FC = () => {
               {/* Bottom Icon: Open Cream Jar */}
               <div
                 id="twoshine-icon-jar"
-                onClick={() =>
+                {...zoomable(() =>
                   setSelectedImage({
                     src: TwoShineMain10,
                     title: "TwoShine İkonografi - Açık Kapaklı Nemlendirici Krem Kavanozu",
                   })
-                }
+                )}
                 className="flex-1 flex items-center justify-center p-4 hover:scale-110 transition-transform duration-300 cursor-zoom-in w-full max-w-[220px]"
                 title="Krem Kavanozu İkonunu Büyüt"
               >
@@ -462,54 +367,10 @@ export const TwoShine: React.FC = () => {
       </main>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={selectedImage.title}
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-5xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-neutral-50">
-              <h3 className="text-sm font-semibold text-neutral-800">{selectedImage.title}</h3>
-              <button
-                type="button"
-                onClick={() => setSelectedImage(null)}
-                aria-label="Kapat"
-                className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-4 sm:p-6 overflow-auto max-h-[calc(90vh-70px)] flex items-center justify-center bg-[#FAFAFA]">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.title}
-                className="max-w-full max-h-[75vh] object-contain select-none"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <ImageLightbox image={selectedImage} onClose={closeLightbox} overlayClassName="z-50 bg-black/85" />
 
       {/* Floating Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          id="scroll-to-top-btn"
-          aria-label="Sayfanın Başına Dön"
-          className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-[#8E3E6F] hover:bg-[#732A55] text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
+      <ScrollTopButton colorClassName="bg-[#8E3E6F] hover:bg-[#732A55]" />
     </div>
   );
 };

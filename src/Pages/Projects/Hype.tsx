@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router";
+import { AnimatedImage, ScrollTopButton, zoomable, ImageLightbox, useLightbox, useDocumentTitle } from "@/Components/ProjectShowcase";
 import { ProjectCredits } from "@/Components/ProjectCredits";
 
 // Project Assets
@@ -9,115 +10,10 @@ import HypeMain2 from "@/Resources/Projects/Hype.svg/HypeMain2.svg";
 import HypeMain3 from "@/Resources/Projects/Hype.svg/HypeMain3.svg";
 import HypeFooter from "@/Resources/Projects/Hype.svg/HypeFooter.svg";
 
-interface AnimatedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  wrapperClassName?: string;
-}
-
-const AnimatedImage: React.FC<AnimatedImageProps> = ({
-  className = "",
-  wrapperClassName = "",
-  onLoad,
-  ...props
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const imgRef = React.useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (imgRef.current && imgRef.current.complete) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    // Ekranda belirdikçe (scroll edildikçe) tetiklenmesi için IntersectionObserver
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.08,
-        rootMargin: "0px 0px -40px 0px",
-      }
-    );
-
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const shouldShow = isLoaded && isInView;
-
-  return (
-    <div
-      ref={containerRef}
-      className={`relative overflow-hidden transition-all duration-1000 ease-out will-change-transform will-change-opacity ${shouldShow
-        ? "opacity-100 translate-y-0 scale-100 filter-none"
-        : "opacity-0 translate-y-8 scale-[0.97] blur-[2px]"
-        } ${wrapperClassName}`}
-    >
-      {/* Skeleton Shimmer Placeholder */}
-      <div
-        className={`absolute inset-0 bg-neutral-100 transition-opacity duration-700 pointer-events-none ${isLoaded ? "opacity-0" : "opacity-100 animate-pulse"
-          }`}
-      />
-      <img
-        ref={imgRef}
-        {...props}
-        onLoad={(e) => {
-          setIsLoaded(true);
-          onLoad?.(e);
-        }}
-        className={`w-full h-auto transition-opacity duration-500 ${className}`}
-      />
-    </div>
-  );
-};
 
 export const Hype = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
-
-  useEffect(() => {
-    // Set Page Title
-    if (typeof document !== "undefined") {
-      document.title = "Hype VPN - Mobil Uygulama & UI/UX Tasarımı | Click Design Studio";
-    }
-
-    const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedImage(null);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const { selectedImage, setSelectedImage, close: closeLightbox } = useLightbox();
+  useDocumentTitle("Hype VPN - Mobil Uygulama & UI/UX Tasarımı | Click Design Studio");
 
   return (
     <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col items-center selection:bg-[#1F5BFF] selection:text-white">
@@ -155,7 +51,7 @@ export const Hype = () => {
         {/* Section 1: Hero Banner (Night City Skyline + 3 Ninjas) */}
         <header
           id="hype-hero-section"
-          onClick={() => setSelectedImage({ src: HypeHero, title: "Hype VPN - Şehir İllüstrasyonu & Ninja Karakterleri" })}
+          {...zoomable(() => setSelectedImage({ src: HypeHero, title: "Hype VPN - Şehir İllüstrasyonu & Ninja Karakterleri" }))}
           className="w-full max-w-[1440px] flex justify-center bg-[#09153D] cursor-zoom-in group"
         >
           <h1 className="sr-only">Hype VPN - Yeni Nesil Hızlı ve Güvenli Mobil VPN Uygulaması Tasarımı</h1>
@@ -195,7 +91,7 @@ export const Hype = () => {
         >
           <div
             id="phone-hand-mockup"
-            onClick={() => setSelectedImage({ src: HypeMain2, title: "Hype VPN - Akıllı Telefon ve 3D Uygulama İkonları" })}
+            {...zoomable(() => setSelectedImage({ src: HypeMain2, title: "Hype VPN - Akıllı Telefon ve 3D Uygulama İkonları" }))}
             className="w-full max-w-[760px] sm:max-w-[800px] md:max-w-[806px] flex justify-center cursor-zoom-in group transition-transform duration-500 hover:scale-[1.02]"
           >
             <AnimatedImage
@@ -218,7 +114,7 @@ export const Hype = () => {
         >
           <div
             id="styleguide-swatches-row"
-            onClick={() => setSelectedImage({ src: HypeMain3, title: "Hype VPN - Renk Paleti, Butonlar ve Ülke Bayrakları" })}
+            {...zoomable(() => setSelectedImage({ src: HypeMain3, title: "Hype VPN - Renk Paleti, Butonlar ve Ülke Bayrakları" }))}
             className="w-full max-w-[1262px] flex justify-center cursor-zoom-in group transition-transform duration-500 hover:scale-[1.01]"
           >
             <AnimatedImage
@@ -241,7 +137,7 @@ export const Hype = () => {
         >
           <div
             id="app-screens-showcase"
-            onClick={() => setSelectedImage({ src: HypeFooter, title: "Hype VPN - Splash, Bağlantı, Ülke Seçimi ve Premium Ekranları" })}
+            {...zoomable(() => setSelectedImage({ src: HypeFooter, title: "Hype VPN - Splash, Bağlantı, Ülke Seçimi ve Premium Ekranları" }))}
             className="w-full max-w-[1381px] flex justify-center cursor-zoom-in group transition-transform duration-500 hover:scale-[1.008]"
           >
             <AnimatedImage
@@ -265,56 +161,10 @@ export const Hype = () => {
       </main>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={selectedImage.title}
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-5xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-neutral-50">
-              <h3 className="text-sm font-semibold text-neutral-800">
-                {selectedImage.title}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedImage(null)}
-                aria-label="Kapat"
-                className="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-4 sm:p-6 overflow-auto max-h-[calc(90vh-70px)] flex items-center justify-center bg-[#FAFAFA]">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.title}
-                className="max-w-full max-h-[75vh] object-contain select-none"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <ImageLightbox image={selectedImage} onClose={closeLightbox} />
 
       {/* Floating Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          id="scroll-to-top-btn"
-          aria-label="Sayfanın Başına Dön"
-          className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-[#1F5BFF] hover:bg-[#1647D6] text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
+      <ScrollTopButton colorClassName="bg-[#1F5BFF] hover:bg-[#1647D6]" />
     </div>
   );
 };
