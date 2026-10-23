@@ -174,11 +174,11 @@ export const Projects = () => {
 
       {/* Hero Başlık Bölümü */}
       <section className="bg-[#F2F2F2] relative mx-4 sm:mx-8 md:mx-12 lg:mx-20 min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-20 transition-all">
-        {/* Logo (ana sayfadaki ile aynı boyut ve sayfa konumu; tıklayınca ana sayfaya döner) */}
+        {/* Logo (gri kutuya göre ana sayfadaki ile aynı boyut ve konum; tıklayınca ana sayfaya döner) */}
         <Link
           to="/"
           aria-label="Click Design Studio Ana Sayfa"
-          className="absolute z-[60] -top-12 left-0 sm:-top-14 sm:-left-5 lg:-top-[75px] lg:-left-[49px] transition-transform duration-200 hover:scale-105"
+          className="absolute z-[60] -top-9 left-0 sm:-left-5 lg:-top-[61px] lg:-left-[56px]"
         >
           <img
             src={ClickDesignStudio}
