@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React from "react";
 import { Link } from "react-router";
 import ArrowDown from "@/Resources/Arrows/Down.svg";
 import { BrandProjectInquiry } from "@/Components/Form/Form";
@@ -17,12 +17,10 @@ interface ProjectItem {
   id: string;
   title: string;
   subtitle: string;
-  category: string;
   tags: string[];
   link: string;
   image: string;
   aspect: string;
-  year: string;
   color: string;
   bgColor: string;
 }
@@ -32,12 +30,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "blavi",
     title: "Blavi",
     subtitle: "Mahalle Marketi & Hızlı Teslimat",
-    category: "Marka Kimliği",
     tags: ["Logo", "Dış Mekan", "Mobil Arayüz"],
     link: "/projects/blavi",
     image: BlaviHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#FD4B04",
     bgColor: "#FFF3EC",
   },
@@ -45,12 +41,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "kskstore",
     title: "KSK Store",
     subtitle: "1912 & Kaf-Kaf Mirası",
-    category: "Marka Kimliği",
     tags: ["Spor Kulübü", "3D Görselleştirme", "Ürün Koleksiyonu"],
     link: "/projects/kskstore",
     image: KSKStoreHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#E11D2A",
     bgColor: "#FFF5F5",
   },
@@ -58,12 +52,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "ttopic",
     title: "Ti-Potic (T-Topic)",
     subtitle: "Bebek & Çocuk Patikleri",
-    category: "Marka Kimliği",
     tags: ["Katalog", "Kreatif Sahneleme", "Marka Kimliği"],
     link: "/projects/ttopic",
     image: TTopicHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#C26B5C",
     bgColor: "#FAF4F2",
   },
@@ -71,12 +63,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "twoshine",
     title: "TwoShine",
     subtitle: "Dermokozmetik & Lüks Cilt Bakımı",
-    category: "Marka Kimliği",
     tags: ["3D Render", "Kozmetik", "Lüks Ambalaj"],
     link: "/projects/twoshine",
     image: TwoShineHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#8E3E6F",
     bgColor: "#FDF5FA",
   },
@@ -84,12 +74,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "moccamoon",
     title: "Mocca Moon",
     subtitle: "Tek Kökenli Nitelikli Kahve Deneyimi",
-    category: "Marka Kimliği",
     tags: ["Tipografi", "İllüstrasyon", "Kahve Paketleme"],
     link: "/projects/moccamoon",
     image: MoccaMoonHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#D97706",
     bgColor: "#FFFBF2",
   },
@@ -97,12 +85,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "hype",
     title: "Hype",
     subtitle: "Yeni Nesil Sosyal & Finansal Deneyim",
-    category: "Mobil UI / UX",
     tags: ["Arayüz Tasarımı", "Mobil Uygulama", "Fintech"],
     link: "/projects/hype",
     image: HypeHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#1F5BFF",
     bgColor: "#F0F4FF",
   },
@@ -110,12 +96,10 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "cmd-aluminyum",
     title: "CMD Alüminyum",
     subtitle: "Endüstriyel Mimari & Cephe Sistemleri",
-    category: "Kurumsal Web & Kimlik",
     tags: ["3D Mimari", "Endüstri", "Web Platformu"],
     link: "/projects/cmd-aluminyum",
     image: CMDHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#0284C7",
     bgColor: "#F0F9FF",
   },
@@ -123,27 +107,16 @@ const PROJECTS_DATA: ProjectItem[] = [
     id: "parcadolu",
     title: "Parçadolu",
     subtitle: "Otomotiv Yedek Parça E-Ticaret Platformu",
-    category: "E-Ticaret & UI / UX",
     tags: ["Mobil Arayüz", "3D İkon", "Marka Tasarımı"],
     link: "/projects/parcadolu",
     image: ParcadoluHero,
     aspect: "aspect-[16/9]",
-    year: "2024",
     color: "#F26522",
     bgColor: "#FFF6F0",
   },
 ];
 
-const CATEGORIES = [
-  "Tümü",
-  "Marka Kimliği",
-  "Mobil UI / UX",
-  "Kurumsal Web & Kimlik",
-  "E-Ticaret & UI / UX",
-];
-
 export const Projects = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const dividerCount = 16;
 
   // Aşağı kaydırma süresi (milisaniye cinsinden - istediğiniz gibi değiştirebilirsiniz)
@@ -177,11 +150,6 @@ export const Projects = () => {
 
     requestAnimationFrame(animation);
   };
-
-  const filteredProjects = useMemo(() => {
-    if (selectedCategory === "Tümü") return PROJECTS_DATA;
-    return PROJECTS_DATA.filter((p) => p.category === selectedCategory);
-  }, [selectedCategory]);
 
   return (
     <div className="mt-3 sm:mt-5 min-h-screen flex flex-col gap-12 sm:gap-16 md:gap-24 max-w-[100vw] overflow-x-hidden selection:bg-[#e51921] selection:text-white">
@@ -250,38 +218,17 @@ export const Projects = () => {
         </button>
       </section>
 
-      {/* Filtre Barı & İstatistik */}
-      <div id="projects-grid" className="mx-4 sm:mx-8 md:mx-12 lg:mx-20 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-neutral-200 pb-6 scroll-mt-6">
-        {/* Kategori Butonları */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {CATEGORIES.map((cat) => {
-            const isActive = selectedCategory === cat;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium tracking-wide transition-all duration-200 cursor-pointer ${isActive
-                  ? "bg-[#e51921] text-white shadow-sm"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-                  }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Proje Sayacı */}
+      {/* Proje Sayacı */}
+      <div id="projects-grid" className="mx-4 sm:mx-8 md:mx-12 lg:mx-20 flex items-center justify-end border-b border-neutral-200 pb-6 scroll-mt-6">
         <div className="text-xs sm:text-sm font-medium text-neutral-500 shrink-0">
-          Toplam <span className="font-bold text-neutral-900">{filteredProjects.length}</span> proje listeleniyor
+          Toplam <span className="font-bold text-neutral-900">{PROJECTS_DATA.length}</span> proje listeleniyor
         </div>
       </div>
 
       {/* Proje Kartları Izgarası (Grid) */}
       <section className="mx-4 sm:mx-8 md:mx-12 lg:mx-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-14 lg:gap-16">
-          {filteredProjects.map((project, index) => (
+          {PROJECTS_DATA.map((project, index) => (
             <article
               key={project.id}
               className="group flex flex-col relative"
@@ -305,19 +252,11 @@ export const Projects = () => {
 
                 {/* Hover Kaplaması & İnce Kırmızı Köşe Çizgisi */}
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#e51921] transition-colors duration-300 pointer-events-none" />
-
-                {/* Yıl Rozeti */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-xs px-3 py-1 text-xs font-semibold text-neutral-800 tracking-wider shadow-xs">
-                  {project.year}
-                </div>
               </Link>
 
               {/* Bilgi Başlığı ve Detayları */}
               <div className="mt-5 sm:mt-6 flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-4">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#e51921]">
-                    {project.category}
-                  </span>
+                <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     {project.tags.map((tag) => (
                       <span
