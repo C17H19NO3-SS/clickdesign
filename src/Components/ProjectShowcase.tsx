@@ -16,6 +16,8 @@ interface AnimatedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   mode?: "wrapper" | "image";
   threshold?: number;
   rootMargin?: string;
+  /** Görsel, kapsayıcısını tamamen doldurur (tasarım tuvali içinde) */
+  fill?: boolean;
 }
 
 export const AnimatedImage: React.FC<AnimatedImageProps> = ({
@@ -27,6 +29,7 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
   mode = "wrapper",
   threshold = 0.08,
   rootMargin = "0px 0px -40px 0px",
+  fill = false,
   onLoad,
   ...props
 }) => {
@@ -73,7 +76,7 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
           ref={imgRef}
           {...props}
           onLoad={handleLoad}
-          className={`transition-all duration-700 ease-out will-change-transform ${shouldShow ? "opacity-100 scale-100 translate-y-0" : hiddenClassName
+          className={`${fill ? "w-full h-full object-cover" : ""} transition-all duration-700 ease-out will-change-transform ${shouldShow ? "opacity-100 scale-100 translate-y-0" : hiddenClassName
             } ${className}`}
         />
       </div>
@@ -96,9 +99,138 @@ export const AnimatedImage: React.FC<AnimatedImageProps> = ({
         ref={imgRef}
         {...props}
         onLoad={handleLoad}
-        className={`w-full h-auto transition-opacity duration-500 ${className}`}
+        className={`w-full ${fill ? "h-full object-cover" : "h-auto"} transition-opacity duration-500 ${className}`}
       />
     </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Tasarım tuvali: Figma frame'ini (ör. 1440 genişlik) ekran genişliğine */
+/* oranlı olarak yayar; içindeki öğeler tasarım pikselleriyle konumlanır. */
+/* ------------------------------------------------------------------ */
+
+interface CanvasContextValue {
+  w: number;
+  h: number;
+  onOpen?: (image: SelectedImage) => void;
+  imageProps?: Partial<AnimatedImageProps>;
+}
+
+const CanvasContext = React.createContext<CanvasContextValue>({ w: 1440, h: 1 });
+
+const pct = (value: number, total: number) => `${(value / total) * 100}%`;
+
+interface DesignCanvasProps {
+  /** Figma frame yüksekliği (px) */
+  height: number;
+  /** Figma frame genişliği (px) */
+  width?: number;
+  /** Görsele tıklanınca çağrılır (lightbox) */
+  onOpen?: (image: SelectedImage) => void;
+  /** Tuvaldeki tüm görsellere uygulanacak AnimatedImage ayarları */
+  imageProps?: Partial<AnimatedImageProps>;
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const DesignCanvas: React.FC<DesignCanvasProps> = ({
+  height,
+  width = 1440,
+  onOpen,
+  imageProps,
+  className = "",
+  children,
+}) => (
+  <CanvasContext.Provider value={{ w: width, h: height, onOpen, imageProps }}>
+    <div
+      className={`relative w-full overflow-hidden ${className}`}
+      // cqw: köşe yuvarlaklıkları tuval genişliğiyle orantılı ölçeklensin
+      style={{ aspectRatio: `${width} / ${height}`, containerType: "inline-size" }}
+    >
+      {children}
+    </div>
+  </CanvasContext.Provider>
+);
+
+interface PlacedProps {
+  /** Figma'daki konum ve boyut (px) */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** Köşe yuvarlaklığı (Figma px) */
+  radius?: number;
+  className?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}
+
+/** Tasarım tuvali içinde Figma koordinatlarıyla konumlanan kutu */
+export const Placed: React.FC<PlacedProps & React.HTMLAttributes<HTMLDivElement>> = ({
+  x,
+  y,
+  w,
+  h,
+  radius,
+  className = "",
+  style,
+  children,
+  ...rest
+}) => {
+  const c = React.useContext(CanvasContext);
+  return (
+    <div
+      {...rest}
+      className={`absolute ${radius ? "overflow-hidden" : ""} ${className}`}
+      style={{
+        left: pct(x, c.w),
+        top: pct(y, c.h),
+        width: pct(w, c.w),
+        height: pct(h, c.h),
+        borderRadius: radius ? `${(radius / c.w) * 100}cqw` : undefined,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+interface CanvasImageProps extends Omit<PlacedProps, "children"> {
+  src: string;
+  alt: string;
+  /** Lightbox başlığı; verilmezse görsel tıklanamaz */
+  title?: string;
+  eager?: boolean;
+  /** Görseli yatay aynala (Figma'daki flip) */
+  flipX?: boolean;
+  id?: string;
+}
+
+/** Tuval içinde Figma konumunda, tıklanınca büyüyen görsel */
+export const CanvasImage: React.FC<CanvasImageProps> = ({ src, alt, title, eager, flipX, id, className = "", ...placement }) => {
+  const c = React.useContext(CanvasContext);
+  const open = title && c.onOpen ? () => c.onOpen!({ src, title }) : undefined;
+  return (
+    <Placed
+      {...placement}
+      id={id}
+      {...(open ? zoomable(open) : {})}
+      className={`${open ? "cursor-zoom-in group" : ""} ${className}`}
+    >
+      <AnimatedImage
+        {...c.imageProps}
+        fill
+        src={src}
+        alt={alt}
+        wrapperClassName="w-full h-full"
+        className={`select-none ${open ? "group-hover:brightness-105 transition-all duration-300" : ""} ${flipX ? "-scale-x-100" : ""}`}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={eager ? "high" : undefined}
+      />
+    </Placed>
   );
 };
 

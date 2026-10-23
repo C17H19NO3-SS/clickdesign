@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router";
 import {
-  AnimatedImage as BaseAnimatedImage,
+  DesignCanvas,
+  CanvasImage,
   ScrollTopButton,
-  zoomable,
   LightboxModal,
   LightboxButton,
   useDocumentTitle,
+  Placed,
+  zoomable,
 } from "@/Components/ProjectShowcase";
 
 // Project Assets
@@ -18,6 +20,7 @@ import KSKStoreMain4 from "@/Resources/Projects/KSKStore.svg/KSKStoreMain4.svg";
 import KSKStoreMain5 from "@/Resources/Projects/KSKStore.svg/KSKStoreMain5.svg";
 import KSKStoreMain6Red from "@/Resources/Projects/KSKStore.svg/KSKStoreMain6Red.svg";
 import KSKStoreMain6White from "@/Resources/Projects/KSKStore.svg/KSKStoreMain6White.svg";
+import KSKStoreMain7 from "@/Resources/Projects/KSKStore.svg/KSKStoreMain7.svg";
 import KSKStoreMain8 from "@/Resources/Projects/KSKStore.svg/KSKStoreMain8.svg";
 
 // Individual Card Assets for Lightbox & Interactive Previews
@@ -27,11 +30,6 @@ import KSKStoreCardJersey from "@/Resources/Projects/KSKStore.svg/KSKStoreCardJe
 import KSKStoreCardBall from "@/Resources/Projects/KSKStore.svg/KSKStoreCardBall.svg";
 import KSKFlowingRibbon from "@/Components/KSKFlowingRibbon";
 import { ProjectCredits } from "@/Components/ProjectCredits";
-
-// Bu sayfanın görsel animasyon ayarları
-const AnimatedImage: React.FC<React.ComponentProps<typeof BaseAnimatedImage>> = (props) => (
-  <BaseAnimatedImage skeletonClassName="bg-[#F2F2F2]" hiddenClassName="opacity-0 translate-y-6 scale-[0.99] blur-[1px]" threshold={0.06} rootMargin="0px 0px -20px 0px" {...props} />
-);
 
 interface GalleryItem {
   src: string;
@@ -197,236 +195,36 @@ export const KSKStore: React.FC = () => {
       </nav>
 
       {/* Main Container */}
-      <main className="w-full flex flex-col items-center overflow-x-hidden bg-[#FDFDFD]">
-        {/* Dark Showcase Top Block: Hero -> Flowing Ribbon Seam -> Facade -> Interior */}
-        <div className="w-full flex flex-col items-center relative z-0">
-          {/* Section 1: Hero Banner (Crest with glowing aura & red topographic waves) */}
-          <header
-            id="kskstore-hero-section"
-            {...zoomable(() => openLightboxBySrc(KSKStoreHero))}
-            className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group relative z-0"
+      <main className="w-full flex flex-col items-center">
+        <h1 className="sr-only">KSK Store - Karşıyaka Spor Kulübü Mağaza ve Marka Kimliği Tasarımı</h1>
+        {/* Figma "Work-KSK Store" frame'i: 1440×6282 tasarım tuvali, ekran genişliğine oranlı */}
+        <DesignCanvas height={6282} onOpen={(image) => openLightboxBySrc(image.src)} imageProps={{ skeletonClassName: "bg-[#F2F2F2]", hiddenClassName: "opacity-0 translate-y-6 scale-[0.99] blur-[1px]", threshold: 0.06, rootMargin: "0px 0px -20px 0px" }}>
+          <CanvasImage src={KSKStoreMain2} x={0} y={810} w={1440} h={1078} title="KSK Store - Mağaza Dış Cephe & Işıklı 3D Tabela" alt="KSK Store siyah mağaza dış cephesi üzerinde 3D ışıklı kabartma logo ve cam vitrin görüntüsü" />
+          <CanvasImage src={KSKStoreHero} x={0} y={0} w={1440} h={810} eager title="Karşıyaka Spor Kulübü - Hero & Arma Sunumu" alt="Karşıyaka Spor Kulübü 1912 yeşil kırmızı kalkan arması ve kırmızı topografik dalgalı zemin sunumu" />
+          {/* Akan kırmızı şerit (Figma: -9.52° eğimli band, 0..1440 × 704..1179) */}
+          <Placed
+            x={0}
+            y={704}
+            w={1440}
+            h={475}
+            {...zoomable(() => openLightboxBySrc(KSKStoreMain1))}
+            className="cursor-zoom-in select-none"
+            title="Akan KSK Store Şeridi - Yakınlaştırmak için tıklayın"
           >
-            <h1 className="sr-only">KSK Store - Karşıyaka Spor Kulübü Mağaza ve Marka Kimliği Tasarımı</h1>
-            <AnimatedImage
-              id="kskstore-hero-image"
-              src={KSKStoreHero}
-              alt="Karşıyaka Spor Kulübü 1912 yeşil kırmızı kalkan arması ve kırmızı topografik dalgalı zemin sunumu"
-              wrapperClassName="w-full max-w-[1440px]"
-              className="w-full h-auto object-cover select-none group-hover:brightness-105 transition-all duration-300 block"
-              fetchPriority="high"
-              decoding="sync"
-              skeletonClassName="bg-black"
-            />
-          </header>
+            <KSKFlowingRibbon speedSeconds={16} />
+          </Placed>
+          <CanvasImage src={KSKStoreMain7} x={0} y={4600} w={1440} h={784} alt="KSK Store sosyal medya görselleri: krampon, mağaza girişi, forma ve maç topu" />
+          {/* Sosyal medya kartları (görsel: KSKStoreMain7); tam görünen iki kart lightbox'ta açılır */}
+          <Placed x={74} y={4600} w={628} h={784} radius={40} {...zoomable(() => openLightboxBySrc(KSKStoreCardCleat))} aria-label="KSK Store - Krampon & 3D Krom Tipografi" className="cursor-zoom-in" />
+          <Placed x={742} y={4600} w={628} h={784} radius={40} {...zoomable(() => openLightboxBySrc(KSKStoreCardEntrance))} aria-label="KSK Store - Mağaza Girişi & Hoş Geldiniz" className="cursor-zoom-in" />
+          <CanvasImage src={KSKStoreMain4} x={65} y={2652} w={1315} h={984} radius={40} title="KSK Store - Teknik Çizim & Mimari Blueprint" alt="Mavi grid arka plan üzerinde KSK STORE logosu milimetrik teknik çizimi ve malzeme özellikleri" />
+          <CanvasImage src={KSKStoreMain5} x={64} y={3697} w={1316} h={740} radius={50} title="KSK Store - Kurumsal Logo & Tipografi" alt="Siyah zemin üzerinde beyaz ve kırmızı KSK STORE ana logosu ve kulüp arması" />
+          <CanvasImage src={KSKStoreMain6Red} x={118.83} y={4218.84} w={571.24} h={321.32} radius={50} title="KSK Store - Kırmızı Zemin Logo Varyasyonu" alt="Kırmızı zemin üzerinde beyaz KSK STORE logosu" />
+          <CanvasImage src={KSKStoreMain6White} x={753.93} y={4218.84} w={571.24} h={321.32} radius={50} title="KSK Store - Beyaz Zemin Logo Varyasyonu" alt="Beyaz zemin üzerinde kırmızı KSK STORE logosu" />
+          <CanvasImage src={KSKStoreMain3} x={0} y={1781} w={1440} h={810} title="KSK Store - Mağaza İçi Deneyim & Perakende Alanı" alt="KSK Store mağaza içi yeşil ve kırmızı duvarlar, çubuklu Karşıyaka formaları, şapkalar, atkılar ve satış bankosu" />
+          <CanvasImage src={KSKStoreMain8} x={73} y={5470} w={1295} h={729} radius={40} title="KSK Store - Jakarlı Kırmızı Taraftar Atkısı" alt="Beton zemin üzerinde katlanmış kırmızı örgü KSK STORE logolu ve saçaklı jakar taraftar atkısı" />
+        </DesignCanvas>
 
-          {/* Section 2: Flowing Angled Red Ribbon Marquee (Positioned right at the seam between Hero and Facade) */}
-          <section
-            id="kskstore-ribbon-section"
-            aria-label="KSK Store Tipografik Akan Şerit"
-            className="w-full max-w-[1440px] relative z-20 h-0 flex justify-center pointer-events-none"
-          >
-            <div
-              {...zoomable(() => openLightboxBySrc(KSKStoreMain1))}
-              className="w-full absolute top-0 -translate-y-[50%] max-w-[1440px] cursor-zoom-in group pointer-events-auto select-none"
-              title="Akan KSK Store Şeridi - Yakınlaştırmak için tıklayın"
-            >
-              <KSKFlowingRibbon speedSeconds={16} />
-            </div>
-          </section>
-
-          {/* Section 3: Storefront Exterior (3D illuminated logo on dark facade) */}
-          <section
-            id="kskstore-facade-section"
-            aria-label="KSK Store Dış Cephe ve Işıklı Tabela"
-            {...zoomable(() => openLightboxBySrc(KSKStoreMain2))}
-            className="w-full max-w-[1440px] relative z-10 flex justify-center cursor-zoom-in group"
-          >
-            <AnimatedImage
-              id="kskstore-facade-image"
-              src={KSKStoreMain2}
-              alt="KSK Store siyah mağaza dış cephesi üzerinde 3D ışıklı kabartma logo ve cam vitrin görüntüsü"
-              wrapperClassName="w-full max-w-[1440px]"
-              className="w-full h-auto object-cover select-none group-hover:brightness-105 transition-all duration-300 block"
-              loading="eager"
-              decoding="async"
-              skeletonClassName="bg-black"
-            />
-          </section>
-
-          {/* Section 4: Store Interior Experience (Mannequins, jerseys, shelving, counter) */}
-          <section
-            id="kskstore-interior-section"
-            aria-label="KSK Store Mağaza İçi Perakende Deneyimi"
-            {...zoomable(() => openLightboxBySrc(KSKStoreMain3))}
-            className="w-full max-w-[1440px] flex justify-center cursor-zoom-in group relative z-0"
-          >
-            <AnimatedImage
-              id="kskstore-interior-image"
-              src={KSKStoreMain3}
-              alt="KSK Store mağaza içi yeşil ve kırmızı duvarlar, çubuklu Karşıyaka formaları, şapkalar, atkılar ve satış bankosu"
-              wrapperClassName="w-full max-w-[1440px]"
-              className="w-full h-auto object-cover select-none group-hover:brightness-105 transition-all duration-300 block"
-              loading="lazy"
-              decoding="async"
-              skeletonClassName="bg-black"
-            />
-          </section>
-        </div>
-
-        {/* Section 5: Architectural Blueprint / CAD Drawing Card */}
-        <section
-          id="kskstore-blueprint-section"
-          aria-label="KSK Store Teknik Mimari Çizim ve Pafta"
-          {...zoomable(() => openLightboxBySrc(KSKStoreMain4))}
-          className="w-full max-w-[1316px] px-4 sm:px-8 my-8 sm:my-14 md:my-18 flex justify-center cursor-zoom-in group"
-        >
-          <div className="w-full rounded-[30px] sm:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-[#0F223D]">
-            <AnimatedImage
-              id="kskstore-blueprint-image"
-              src={KSKStoreMain4}
-              alt="Mavi grid arka plan üzerinde KSK STORE logosu milimetrik teknik çizimi ve malzeme özellikleri"
-              wrapperClassName="w-full"
-              className="w-full h-auto object-contain select-none group-hover:scale-[1.01] transition-transform duration-500"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        </section>
-
-        {/* Section 6: Brand Identity Matrix / Logo Variations Card */}
-        <section
-          id="kskstore-logo-matrix-section"
-          aria-label="KSK Store Marka Kimliği ve Logo Varyasyonları"
-          className="w-full max-w-[1316px] px-4 sm:px-8 my-8 sm:my-14 md:my-18 flex justify-center"
-        >
-          {/* Outer Black Container with rounded corners */}
-          <div className="w-full bg-[#181818] rounded-[36px] sm:rounded-[46px] md:rounded-[50px] p-6 sm:p-10 md:p-14 relative shadow-xl border border-neutral-800 flex flex-col items-center mb-30">
-            {/* Upper Logo: KSKStoreMain5 */}
-            <div
-              id="kskstore-main-logo-card"
-              {...zoomable(() => openLightboxBySrc(KSKStoreMain5))}
-              className="w-full max-w-[1000px] cursor-zoom-in group py-2 sm:py-6"
-              title="Ana Logoyu Büyüt"
-            >
-              <AnimatedImage
-                id="kskstore-main5-image"
-                src={KSKStoreMain5}
-                alt="Siyah zemin üzerinde beyaz ve kırmızı KSK STORE ana logosu ve kulüp arması"
-                wrapperClassName="w-full"
-                className="w-full h-auto object-contain select-none group-hover:scale-[1.02] transition-transform duration-300"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
-            {/* Bottom Subcards: Red Card (left) & White Card (right) - both symmetrically hanging down past the container edge */}
-            <div className="w-full max-w-[1100px] grid grid-cols-2 gap-3 sm:gap-6 md:gap-10 items-end mt-4 sm:mt-6 md:mt-8 absolute -bottom-50">
-              {/* Left Card: Red Background Logo (Protrudes past the bottom container edge) */}
-              <div
-                id="kskstore-red-logo-tile"
-                {...zoomable(() => openLightboxBySrc(KSKStoreMain6Red))}
-                className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 translate-y-6 sm:translate-y-10 md:translate-y-14 hover:translate-y-4 md:hover:translate-y-8 cursor-zoom-in relative z-10 border border-white/10 group"
-                title="Kırmızı Logo Kartını Büyüt"
-              >
-                <AnimatedImage
-                  id="kskstore-red-card-image"
-                  src={KSKStoreMain6Red}
-                  alt="Kırmızı zemin üzerinde beyaz KSK STORE logosu"
-                  wrapperClassName="w-full bg-[#F21414]"
-                  className="w-full h-auto object-contain select-none group-hover:scale-[1.02] transition-transform duration-300"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-
-              {/* Right Card: White Background Logo (Also protrudes past the bottom container edge symmetrically) */}
-              <div
-                id="kskstore-white-logo-tile"
-                {...zoomable(() => openLightboxBySrc(KSKStoreMain6White))}
-                className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 translate-y-6 sm:translate-y-10 md:translate-y-14 hover:translate-y-4 md:hover:translate-y-8 cursor-zoom-in relative z-10 border border-neutral-200/50 group"
-                title="Beyaz Logo Kartını Büyüt"
-              >
-                <AnimatedImage
-                  id="kskstore-white-card-image"
-                  src={KSKStoreMain6White}
-                  alt="Beyaz zemin üzerinde kırmızı KSK STORE logosu"
-                  wrapperClassName="w-full bg-white"
-                  className="w-full h-auto object-contain select-none group-hover:scale-[1.02] transition-transform duration-300"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 7: Dual Grid Showcase Cards (Cleat with chrome type & Storefront entrance) */}
-        <section
-          id="kskstore-cards-showcase-section"
-          aria-label="KSK Store Ürün ve Giriş Vitrini"
-          className="w-full max-w-[1360px] px-4 sm:px-8 mt-16 sm:mt-24 md:mt-32 relative z-0 flex flex-col items-center"
-        >
-          {/* Dual Cards: Left (Cleat) & Right (Store Entrance) */}
-          <div className="w-full grid grid-cols-2 gap-3 sm:gap-6 md:gap-10 items-center justify-center">
-            {/* Left Card: KSK Krampon */}
-            <div
-              id="kskstore-cleat-card"
-              {...zoomable(() => openLightboxBySrc(KSKStoreCardCleat))}
-              className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 cursor-zoom-in group"
-              title="Krampon Vitrinini Büyüt"
-            >
-              <AnimatedImage
-                id="kskstore-cleat-image"
-                src={KSKStoreCardCleat}
-                alt="KSK Store kırmızı kramponu, 3D krom tipografi ve topografik kontur çizgileri"
-                wrapperClassName="w-full"
-                className="w-full h-auto object-contain select-none group-hover:scale-[1.015] transition-transform duration-500"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
-            {/* Right Card: Mağaza Girişi */}
-            <div
-              id="kskstore-entrance-card"
-              {...zoomable(() => openLightboxBySrc(KSKStoreCardEntrance))}
-              className="w-full rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 cursor-zoom-in group"
-              title="Mağaza Girişini Büyüt"
-            >
-              <AnimatedImage
-                id="kskstore-entrance-image"
-                src={KSKStoreCardEntrance}
-                alt="KSK Store mağaza cam girişi, ışıklı tabela ve hoş geldiniz karşılama alanı"
-                wrapperClassName="w-full"
-                className="w-full h-auto object-contain select-none group-hover:scale-[1.015] transition-transform duration-500"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Section 8: Knitted Fan Scarf Showcase */}
-        <section
-          id="kskstore-scarf-section"
-          aria-label="KSK Store Jakarlı Taraftar Atkısı"
-          {...zoomable(() => openLightboxBySrc(KSKStoreMain8))}
-          className="w-full max-w-[1295px] px-4 sm:px-8 my-10 sm:my-16 md:my-22 flex justify-center cursor-zoom-in group"
-        >
-          <div className="w-full rounded-[30px] sm:rounded-[40px] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-white border border-neutral-100">
-            <AnimatedImage
-              id="kskstore-scarf-image"
-              src={KSKStoreMain8}
-              alt="Beton zemin üzerinde katlanmış kırmızı örgü KSK STORE logolu ve saçaklı jakar taraftar atkısı"
-              wrapperClassName="w-full"
-              className="w-full h-auto object-contain select-none group-hover:scale-[1.01] transition-transform duration-500"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        </section>
-
-        {/* Section 9: Project Details & Agency Footer */}
         <ProjectCredits
           title="KSK Store"
           badge="1912 • Kaf-Kaf"

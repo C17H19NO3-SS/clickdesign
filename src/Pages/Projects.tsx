@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 import ArrowDown from "@/Resources/Arrows/Down.svg";
+import ClickDesignStudio from "@/Resources/HomePage/ClickDesignStudio.svg";
 import { BrandProjectInquiry } from "@/Components/Form/Form";
 
 // Proje Hero Kapak Görselleri
@@ -152,7 +153,7 @@ export const Projects = () => {
   };
 
   return (
-    <div className="mt-3 sm:mt-5 min-h-screen flex flex-col gap-12 sm:gap-16 md:gap-24 max-w-[100vw] overflow-x-hidden selection:bg-[#e51921] selection:text-white">
+    <div className="mt-3 sm:mt-5 min-h-screen flex flex-col gap-12 sm:gap-16 md:gap-24 max-w-[100vw] overflow-x-clip selection:bg-[#e51921] selection:text-white">
       {/* Arka Plan Dikey Grid Çizgileri (Ana Sayfa ile Birebir Uyumlu) */}
       <div
         className="pointer-events-none -z-10 min-h-max min-w-full fixed inset-0 mx-auto max-w-360 grid border-x border-neutral-100"
@@ -173,6 +174,20 @@ export const Projects = () => {
 
       {/* Hero Başlık Bölümü */}
       <section className="bg-[#F2F2F2] relative mx-4 sm:mx-8 md:mx-12 lg:mx-20 min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-20 transition-all">
+        {/* Logo (ana sayfadaki ile aynı boyut ve sayfa konumu; tıklayınca ana sayfaya döner) */}
+        <Link
+          to="/"
+          aria-label="Click Design Studio Ana Sayfa"
+          className="absolute z-[60] -top-12 left-0 sm:-top-14 sm:-left-5 lg:-top-[75px] lg:-left-[49px] transition-transform duration-200 hover:scale-105"
+        >
+          <img
+            src={ClickDesignStudio}
+            alt="Click Design Studio"
+            className="block h-8 sm:h-10 md:h-16 lg:h-20 w-auto object-contain"
+            fetchPriority="high"
+          />
+        </Link>
+
         {/* Dekoratif Tipografik Arka Plan */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
           <span className="absolute -right-4 -bottom-6 md:-bottom-12 text-[18vw] sm:text-[14vw] md:text-[12vw] font-montserrat font-black uppercase tracking-tight text-neutral-300/80 leading-none">
