@@ -5,7 +5,17 @@ export type FontVariant =
   | 'script-satisfy'
   | 'script-kaushan'
   | 'slab-heavy'
-  | 'tech-wide';
+  | 'tech-wide'
+  // Figma (Home > Group 5) şeritlerinde kullanılan fontlar
+  | 'mozilla-headline'
+  | 'mozilla-text'
+  | 'montserrat'
+  | 'norican'
+  | 'niramit'
+  | 'orbitron'
+  | 'orbitron-semibold'
+  | 'moul'
+  | 'nokora';
 
 export interface RibbonWordItem {
   id: string;
@@ -16,20 +26,26 @@ export interface RibbonWordItem {
 export type AngleOption =
   | '-18deg'
   | '-14deg'
+  | '-13.5deg'
   | '-9deg'
   | '-4deg'
   | '0deg'
+  | '+1.8deg'
   | '+2.2deg'
   | '+6deg'
+  | '+7deg'
   | '+8.5deg'
   | '+14deg';
 
 export type VerticalPositionOption =
   | '24%'
   | '32%'
+  | '33%'
   | '40%'
   | '46%'
   | '52%'
+  | '53%'
+  | '57%'
   | '62%'
   | '70%';
 
@@ -81,44 +97,98 @@ export const FONT_VARIANT_META: Record<
   sans: {
     label: 'Geometric Sans',
     className: 'font-sans-clean font-medium tracking-tight',
-    sizeClass: 'text-3xl sm:text-4xl md:text-[43px]',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
     fontFamilyCss: "'Plus Jakarta Sans', sans-serif",
   },
   'serif-slab': {
     label: 'Flare Serif',
     className: 'font-serif-slab font-normal tracking-tight',
-    sizeClass: 'text-3xl sm:text-4xl md:text-[45px]',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[45px] lg:text-[64px]',
     fontFamilyCss: "'Crete Round', Georgia, serif",
   },
   'script-lobster': {
     label: 'Calligraphic Script',
     className: 'font-script-lobster font-normal tracking-normal',
-    sizeClass: 'text-3xl sm:text-4xl md:text-[45px]',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[45px] lg:text-[64px]',
     fontFamilyCss: "'Lobster Two', cursive",
   },
   'script-satisfy': {
     label: 'Brush Script',
     className: 'font-script-satisfy font-normal tracking-normal',
-    sizeClass: 'text-3xl sm:text-4xl md:text-[46px]',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[46px] lg:text-[64px]',
     fontFamilyCss: "'Satisfy', cursive",
   },
   'script-kaushan': {
     label: 'Vintage Script',
     className: 'font-script-kaushan font-normal tracking-normal',
-    sizeClass: 'text-3xl sm:text-4xl md:text-[43px]',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
     fontFamilyCss: "'Kaushan Script', cursive",
   },
   'slab-heavy': {
     label: 'Heavy Slab',
     className: 'font-slab-heavy font-normal',
-    sizeClass: 'text-3xl sm:text-4xl md:text-[41px]',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[41px] lg:text-[64px]',
     fontFamilyCss: "'Alfa Slab One', serif",
   },
   'tech-wide': {
     label: 'Wide Tech Display',
     className: 'font-tech-wide font-normal tracking-tight',
-    sizeClass: 'text-2xl sm:text-3xl md:text-[34px]',
+    sizeClass: 'text-2xl sm:text-3xl md:text-[34px] lg:text-[50px]',
     fontFamilyCss: "'Michroma', sans-serif",
+  },
+  'mozilla-headline': {
+    label: 'Mozilla Headline SemiBold',
+    className: 'font-mozilla-headline font-semibold tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Mozilla Headline', sans-serif",
+  },
+  'mozilla-text': {
+    label: 'Mozilla Text SemiBold',
+    className: 'font-mozilla-text font-semibold tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Mozilla Text', sans-serif",
+  },
+  montserrat: {
+    label: 'Montserrat SemiBold',
+    className: 'font-montserrat font-semibold tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Montserrat', sans-serif",
+  },
+  norican: {
+    label: 'Norican Script',
+    className: 'font-norican font-normal tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Norican', cursive",
+  },
+  niramit: {
+    label: 'Niramit',
+    className: 'font-niramit font-normal tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Niramit', sans-serif",
+  },
+  orbitron: {
+    label: 'Orbitron',
+    className: 'font-orbitron font-normal tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Orbitron', sans-serif",
+  },
+  'orbitron-semibold': {
+    label: 'Orbitron SemiBold',
+    className: 'font-orbitron font-semibold tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Orbitron', sans-serif",
+  },
+  moul: {
+    label: 'Moul',
+    className: 'font-moul font-normal tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Moul', serif",
+  },
+  nokora: {
+    label: 'Nokora',
+    className: 'font-nokora font-normal tracking-normal',
+    sizeClass: 'text-3xl sm:text-4xl md:text-[43px] lg:text-[64px]',
+    fontFamilyCss: "'Nokora', sans-serif",
   },
 };
 
@@ -135,31 +205,31 @@ export const BAND_COLOR_META: Record<
   }
 > = {
   charcoal: {
-    label: 'Koyu Antrasit (#1B1B1B)',
-    bgClass: 'bg-[#1B1B1B]',
+    label: 'Koyu Antrasit (#1A1A1A)',
+    bgClass: 'bg-[#1A1A1A]',
     textClass: 'text-white',
-    dividerClass: '',
-    swatchClass: 'bg-[#1B1B1B]',
-    bgHex: '#1B1B1B',
+    dividerClass: 'bg-white/75',
+    swatchClass: 'bg-[#1A1A1A]',
+    bgHex: '#1A1A1A',
     textHex: '#FFFFFF',
   },
   scarlet: {
-    label: 'Canlı Kırmızı (#F21313)',
-    bgClass: 'bg-[#F21313]',
-    textClass: 'text-[#181818]',
-    dividerClass: 'bg-[#181818]/75',
-    swatchClass: 'bg-[#F21313]',
-    bgHex: '#F21313',
-    textHex: '#181818',
+    label: 'Canlı Kırmızı (#F21414)',
+    bgClass: 'bg-[#F21414]',
+    textClass: 'text-[#1A1A1A]',
+    dividerClass: 'bg-[#1A1A1A]/75',
+    swatchClass: 'bg-[#F21414]',
+    bgHex: '#F21414',
+    textHex: '#1A1A1A',
   },
   coral: {
-    label: 'Mercan Kırmızı (#FF4A4A)',
-    bgClass: 'bg-[#FF4A4A]',
-    textClass: 'text-[#1E1E1E]',
-    dividerClass: 'bg-[#1E1E1E]/75',
-    swatchClass: 'bg-[#FF4A4A]',
-    bgHex: '#FF4A4A',
-    textHex: '#1E1E1E',
+    label: 'Mercan Kırmızı (#FF4343)',
+    bgClass: 'bg-[#FF4343]',
+    textClass: 'text-[#1A1A1A]',
+    dividerClass: 'bg-[#1A1A1A]/75',
+    swatchClass: 'bg-[#FF4343]',
+    bgHex: '#FF4343',
+    textHex: '#1A1A1A',
   },
   ivory: {
     label: 'Kırık Beyaz (#F4F4F0)',
@@ -202,11 +272,14 @@ export const BAND_COLOR_META: Record<
 export const ANGLE_CLASS_MAP: Record<AngleOption, string> = {
   '-18deg': '-rotate-[18deg]',
   '-14deg': '-rotate-[14deg]',
+  '-13.5deg': '-rotate-[13.5deg]',
   '-9deg': '-rotate-[9deg]',
   '-4deg': '-rotate-[4deg]',
   '0deg': 'rotate-0',
+  '+1.8deg': 'rotate-[1.8deg]',
   '+2.2deg': 'rotate-[2.2deg]',
   '+6deg': 'rotate-[6deg]',
+  '+7deg': 'rotate-[7deg]',
   '+8.5deg': 'rotate-[8.5deg]',
   '+14deg': 'rotate-[14deg]',
 };
@@ -214,9 +287,12 @@ export const ANGLE_CLASS_MAP: Record<AngleOption, string> = {
 export const VERTICAL_POS_CLASS_MAP: Record<VerticalPositionOption, string> = {
   '24%': 'top-[24%]',
   '32%': 'top-[32%]',
+  '33%': 'top-[33%]',
   '40%': 'top-[40%]',
   '46%': 'top-[46%]',
   '52%': 'top-[52%]',
+  '53%': 'top-[53%]',
+  '57%': 'top-[57%]',
   '62%': 'top-[62%]',
   '70%': 'top-[70%]',
 };
@@ -235,211 +311,3 @@ export const Z_INDEX_CLASS_MAP: Record<ZIndexOption, string> = {
   30: 'z-30',
   40: 'z-40',
 };
-
-export const PRESET_THEMES: MarqueeThemePreset[] = [
-  {
-    id: 'reference-exact',
-    name: 'Orijinal Görsel (1:1 Referans)',
-    subtitle: 'Görseldeki siyah, mercan ve parlak kırmızı 3 katmanlı kesişen bant tasarımı',
-    canvasBg: 'light-grid',
-    bands: [
-      {
-        id: 'band-1',
-        label: '1. Bant — Üst Çapraz Siyah Şerit',
-        enabled: true,
-        angle: '+8.5deg',
-        verticalPos: '32%',
-        colorScheme: 'charcoal',
-        direction: 'left',
-        speedSeconds: 28,
-        zIndex: 10,
-        initialOffsetClass: 'pl-[18vw]',
-        hasShadow: false,
-        items: [
-          { id: 'b1-1', text: 'Animation', font: 'serif-slab' },
-          { id: 'b1-2', text: 'User Experience', font: 'script-lobster' },
-          { id: 'b1-3', text: 'AI', font: 'sans' },
-          { id: 'b1-4', text: 'Motion Design', font: 'tech-wide' },
-          { id: 'b1-5', text: '3D Visuals', font: 'slab-heavy' },
-          { id: 'b1-6', text: 'Creative Direction', font: 'script-satisfy' },
-        ],
-      },
-      {
-        id: 'band-2',
-        label: '2. Bant — Alt Çapraz Mercan Şerit',
-        enabled: true,
-        angle: '-14deg',
-        verticalPos: '52%',
-        colorScheme: 'coral',
-        direction: 'right',
-        speedSeconds: 36,
-        zIndex: 20,
-        initialOffsetClass: 'pl-[18vw]',
-        hasShadow: false,
-        items: [
-          { id: 'b2-1', text: 'Frontend', font: 'sans' },
-          { id: 'b2-2', text: 'Backend', font: 'script-kaushan' },
-          { id: 'b2-3', text: 'Webflow', font: 'slab-heavy' },
-          { id: 'b2-4', text: 'App Design', font: 'sans' },
-          { id: 'b2-5', text: 'Design Systems', font: 'tech-wide' },
-          { id: 'b2-6', text: 'Prototyping', font: 'script-satisfy' },
-        ],
-      },
-      {
-        id: 'band-3',
-        label: '3. Bant — Ön Katman Kırmızı Şerit',
-        enabled: true,
-        angle: '+2.2deg',
-        verticalPos: '46%',
-        colorScheme: 'scarlet',
-        direction: 'left',
-        speedSeconds: 20,
-        zIndex: 30,
-        initialOffsetClass: 'pl-[19vw]',
-        hasShadow: false,
-        items: [
-          { id: 'b3-1', text: 'Social Media', font: 'sans' },
-          { id: 'b3-2', text: 'Logo', font: 'slab-heavy' },
-          { id: 'b3-3', text: 'Branding', font: 'tech-wide' },
-          { id: 'b3-4', text: 'Print', font: 'script-satisfy' },
-          { id: 'b3-5', text: 'User Interface', font: 'sans' },
-          { id: 'b3-6', text: 'Editorial', font: 'serif-slab' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'brutalist-dark',
-    name: 'Koyu Brutalist Stüdyo',
-    subtitle: 'Siyah ızgara zemin üzerinde asit yeşili, kırık beyaz ve elektrik kobalt bantlar',
-    canvasBg: 'dark-grid',
-    bands: [
-      {
-        id: 'band-1',
-        label: '1. Bant — Üst Çapraz Kobalt',
-        enabled: true,
-        angle: '+8.5deg',
-        verticalPos: '32%',
-        colorScheme: 'cobalt',
-        direction: 'left',
-        speedSeconds: 28,
-        zIndex: 10,
-        initialOffsetClass: 'pl-[18vw]',
-        hasShadow: true,
-        items: [
-          { id: 'd1-1', text: 'Animation', font: 'serif-slab' },
-          { id: 'd1-2', text: 'User Experience', font: 'script-lobster' },
-          { id: 'd1-3', text: 'AI', font: 'sans' },
-          { id: 'd1-4', text: 'Creative Coding', font: 'tech-wide' },
-          { id: 'd1-5', text: 'WebGL Shaders', font: 'slab-heavy' },
-        ],
-      },
-      {
-        id: 'band-2',
-        label: '2. Bant — Alt Çapraz Beyaz',
-        enabled: true,
-        angle: '-14deg',
-        verticalPos: '52%',
-        colorScheme: 'ivory',
-        direction: 'right',
-        speedSeconds: 28,
-        zIndex: 20,
-        initialOffsetClass: 'pl-[18vw]',
-        hasShadow: true,
-        items: [
-          { id: 'd2-1', text: 'Frontend', font: 'sans' },
-          { id: 'd2-2', text: 'Backend', font: 'script-kaushan' },
-          { id: 'd2-3', text: 'Fullstack', font: 'slab-heavy' },
-          { id: 'd2-4', text: 'App Design', font: 'sans' },
-          { id: 'd2-5', text: 'Architecture', font: 'tech-wide' },
-        ],
-      },
-      {
-        id: 'band-3',
-        label: '3. Bant — Ön Katman Asit Yeşili',
-        enabled: true,
-        angle: '+2.2deg',
-        verticalPos: '46%',
-        colorScheme: 'lime',
-        direction: 'left',
-        speedSeconds: 20,
-        zIndex: 30,
-        initialOffsetClass: 'pl-[19vw]',
-        hasShadow: true,
-        items: [
-          { id: 'd3-1', text: 'Social Media', font: 'sans' },
-          { id: 'd3-2', text: 'Logo', font: 'slab-heavy' },
-          { id: 'd3-3', text: 'Branding', font: 'tech-wide' },
-          { id: 'd3-4', text: 'Print', font: 'script-satisfy' },
-          { id: 'd3-5', text: 'User Interface', font: 'sans' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'swiss-editorial',
-    name: 'İsviçre Editoryal Monokrom',
-    subtitle: 'Antrasit, kırık beyaz ve tek bir vurgu kırmızısı ile yüksek kontrastlı tipografi',
-    canvasBg: 'light-grid',
-    bands: [
-      {
-        id: 'band-1',
-        label: '1. Bant — Üst Çapraz Antrasit',
-        enabled: true,
-        angle: '+6deg',
-        verticalPos: '32%',
-        colorScheme: 'charcoal',
-        direction: 'left',
-        speedSeconds: 36,
-        zIndex: 10,
-        initialOffsetClass: 'pl-[18vw]',
-        hasShadow: true,
-        items: [
-          { id: 's1-1', text: 'Typography', font: 'serif-slab' },
-          { id: 's1-2', text: 'Art Direction', font: 'script-lobster' },
-          { id: 's1-3', text: 'Exhibition', font: 'sans' },
-          { id: 's1-4', text: 'Identity', font: 'tech-wide' },
-        ],
-      },
-      {
-        id: 'band-2',
-        label: '2. Bant — Alt Çapraz Kırık Beyaz',
-        enabled: true,
-        angle: '-9deg',
-        verticalPos: '52%',
-        colorScheme: 'ivory',
-        direction: 'right',
-        speedSeconds: 28,
-        zIndex: 20,
-        initialOffsetClass: 'pl-[18vw]',
-        hasShadow: true,
-        items: [
-          { id: 's2-1', text: 'Frontend', font: 'sans' },
-          { id: 's2-2', text: 'Backend', font: 'script-kaushan' },
-          { id: 's2-3', text: 'Interactive', font: 'slab-heavy' },
-          { id: 's2-4', text: 'App Design', font: 'sans' },
-        ],
-      },
-      {
-        id: 'band-3',
-        label: '3. Bant — Ön Katman Kırmızı',
-        enabled: true,
-        angle: '0deg',
-        verticalPos: '46%',
-        colorScheme: 'scarlet',
-        direction: 'left',
-        speedSeconds: 20,
-        zIndex: 30,
-        initialOffsetClass: 'pl-[19vw]',
-        hasShadow: true,
-        items: [
-          { id: 's3-1', text: 'Social Media', font: 'sans' },
-          { id: 's3-2', text: 'Logo', font: 'slab-heavy' },
-          { id: 's3-3', text: 'Branding', font: 'tech-wide' },
-          { id: 's3-4', text: 'Print', font: 'script-satisfy' },
-          { id: 's3-5', text: 'Packaging', font: 'sans' },
-        ],
-      },
-    ],
-  },
-];

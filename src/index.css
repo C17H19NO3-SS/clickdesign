@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Figma'daki metinlerin tamamı Montserrat; varsayılan sans fontu da Montserrat olsun */
+@theme {
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-montserrat: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+}
+
 @keyframes marquee-scroll-left {
   0% {
     transform: translate3d(0%, 0, 0);
@@ -45,6 +51,39 @@
 
 .font-script-kaushan {
   font-family: "Kaushan Script", cursive;
+}
+
+/* Figma şerit fontları */
+.font-mozilla-headline {
+  font-family: "Mozilla Headline", sans-serif;
+}
+
+.font-mozilla-text {
+  font-family: "Mozilla Text", sans-serif;
+}
+
+.font-norican {
+  font-family: "Norican", cursive;
+}
+
+.font-niramit {
+  font-family: "Niramit", sans-serif;
+}
+
+.font-orbitron {
+  font-family: "Orbitron", sans-serif;
+}
+
+.font-moul {
+  font-family: "Moul", serif;
+}
+
+.font-nokora {
+  font-family: "Nokora", sans-serif;
+}
+
+.font-tech-wide {
+  font-family: "Michroma", sans-serif;
 }
 
 .font-slab-heavy {
