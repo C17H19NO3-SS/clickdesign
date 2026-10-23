@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router";
-import { AnimatedImage as BaseAnimatedImage, ScrollTopButton, zoomable, ImageLightbox, useLightbox } from "@/Components/ProjectShowcase";
+import {
+  DesignCanvas,
+  CanvasImage,
+  ScrollTopButton,
+  ImageLightbox,
+  useLightbox,
+  Placed,
+} from "@/Components/ProjectShowcase";
 import { ProjectCredits } from "@/Components/ProjectCredits";
 
 // Project Assets
@@ -14,11 +21,6 @@ import ParcadoluMain6 from "@/Resources/Projects/Parcadolu.svg/ParcadoluMain6.sv
 import ParcadoluMain7 from "@/Resources/Projects/Parcadolu.svg/ParcadoluMain7.svg";
 import ParcadoluMain8 from "@/Resources/Projects/Parcadolu.svg/ParcadoluMain8.svg";
 import ParcadoluMain9 from "@/Resources/Projects/Parcadolu.svg/ParcadoluMain9.svg";
-
-// Bu sayfanın görsel animasyon ayarları
-const AnimatedImage: React.FC<React.ComponentProps<typeof BaseAnimatedImage>> = (props) => (
-  <BaseAnimatedImage mode="image" hiddenClassName="opacity-0 scale-[0.98] translate-y-3" threshold={0.05} rootMargin="0px 0px -20px 0px" {...props} />
-);
 
 export const Parcadolu: React.FC = () => {
   const { selectedImage, setSelectedImage, close: closeLightbox } = useLightbox();
@@ -62,241 +64,24 @@ export const Parcadolu: React.FC = () => {
       </nav>
 
       {/* Main Container */}
-      <main className="w-full flex flex-col items-center overflow-x-hidden">
-        {/* Section 1: Hero Banner (Red-Orange Gradient with 3D Balloon Gold 'pd' Logo) */}
-        <header
-          id="parcadolu-hero-section"
-          {...zoomable(() =>
-            setSelectedImage({
-              src: ParcadoluHero,
-              title: "Parçadolu - 3D Logo & Hero Tasarımı",
-            })
-          )}
-          className="w-full max-w-[1440px] flex justify-center bg-[#FC0701] cursor-zoom-in group shadow-xs"
-        >
-          <h1 className="sr-only">Parçadolu - E-Ticaret ve Yedek Parça Marka Kimliği</h1>
-          <AnimatedImage
-            id="parcadolu-hero-image"
-            src={ParcadoluHero}
-            alt="Parçadolu kırmızı-turuncu degrade zemin üzerinde metalik altın 3D balon pd logosu"
-            wrapperClassName="w-full max-w-[1440px]"
-            className="w-full h-auto object-cover select-none group-hover:brightness-105 transition-all duration-300"
-            fetchPriority="high"
-            decoding="sync"
-          />
-        </header>
+      <main className="w-full flex flex-col items-center">
+        <h1 className="sr-only">Parçadolu - E-Ticaret ve Yedek Parça Marka Kimliği</h1>
+        {/* Figma "Parcadolu.com" frame'i: 1440×5867 tasarım tuvali, ekran genişliğine oranlı */}
+        <DesignCanvas height={5867} onOpen={setSelectedImage} imageProps={{ mode: "image", hiddenClassName: "opacity-0 scale-[0.98] translate-y-3", threshold: 0.05, rootMargin: "0px 0px -20px 0px" }}>
+          <CanvasImage src={ParcadoluHero} x={0} y={0} w={1440} h={810} eager title="Parçadolu - 3D Logo & Hero Tasarımı" alt="Parçadolu kırmızı-turuncu degrade zemin üzerinde metalik altın 3D balon pd logosu" />
+          <Placed x={0} y={1769} w={1440} h={793} className="bg-[#EFEFEF]" />
+          <CanvasImage src={ParcadoluMain2} x={111} y={1864} w={599} h={599} title="Parçadolu - Mobil Uygulama Arayüzü" alt="Parçadolu mobil uygulama tasarımı kaya üzerinde telefon mockup" />
+          <Placed x={761} y={1864} w={599} h={599} radius={50} className="bg-linear-to-b from-white to-[#DFDFDF]" />
+          <CanvasImage src={ParcadoluMain3} x={852} y={1953} w={189} h={189} title="Parçadolu İkonografi - Amortisör" alt="Amortisör oto parça ikonu" />
+          <CanvasImage src={ParcadoluMain4} x={1097} y={1971} w={171} h={171} title="Parçadolu İkonografi - Fren Diski ve Balata" alt="Fren diski ve balatası oto parça ikonu" />
+          <CanvasImage src={ParcadoluMain5} x={852} y={2182} w={190} h={190} title="Parçadolu İkonografi - Filtre ve Buji" alt="Filtre, buji ve civata oto parça ikonu" />
+          <CanvasImage src={ParcadoluMain6} x={1082} y={2182} w={201} h={193} title="Parçadolu İkonografi - Motor Pistonları" alt="Motor pistonları oto parça ikonu" />
+          <CanvasImage src={ParcadoluMain7} x={0} y={2562} w={1440} h={813} title="Parçadolu - Premium Auto Parts Sunumu" alt="Parçadolu Premium AUTO PARTS siyah podyum üzerinde açılı laptop web sitesi mockup" />
+          <CanvasImage src={ParcadoluMain8} x={38} y={3332} w={1364.17} h={1344} title="Parçadolu - Oto Yedek Parça Ürün Kartları Kompozisyonu" alt="Parçadolu buji, yağ tenekesi, filtreler, Black Friday fren balataları ve ampul ürün kartları" />
+          <CanvasImage src={ParcadoluMain9} x={81} y={4736} w={1261} h={1027} title="Parçadolu - Işıklı Neon Duvar Tabelası" alt="Parçadolu kırmızı ve gece mavisi duvara monte sarı neon ışıklı pd amblemi tabela sunumu" />
+          <CanvasImage src={ParcadoluMain1} x={0} y={810} w={1440} h={957} eager title="Parçadolu - Masaüstü Web Arayüzü & Laptop Mockup" alt="Parçadolu e-ticaret web sitesi arayüzü lastik üzerinde laptop mockup sunumu" />
+        </DesignCanvas>
 
-        {/* Section 2: Laptop Mockup on Tire Banner */}
-        <section
-          id="parcadolu-laptop-tire-section"
-          aria-label="Parçadolu Masaüstü Web Arayüzü - Lastik Üzerinde Laptop"
-          {...zoomable(() =>
-            setSelectedImage({
-              src: ParcadoluMain1,
-              title: "Parçadolu - Masaüstü Web Arayüzü & Laptop Mockup",
-            })
-          )}
-          className="w-full max-w-[1440px] flex justify-center bg-[#C2BDBD] cursor-zoom-in group"
-        >
-          <AnimatedImage
-            id="parcadolu-main1-image"
-            src={ParcadoluMain1}
-            alt="Parçadolu e-ticaret web sitesi arayüzü lastik üzerinde laptop mockup sunumu"
-            wrapperClassName="w-full max-w-[1440px]"
-            className="w-full h-auto object-cover select-none group-hover:scale-[1.01] transition-transform duration-500"
-            loading="eager"
-            decoding="async"
-          />
-        </section>
-
-        {/* Section 3: Dual Rounded Cards (Mobile Phone on Rock + 2x2 Auto Parts Icon Card) */}
-        <section
-          id="parcadolu-mobile-icons-section"
-          aria-label="Mobil Uygulama ve İkonografi"
-          className="w-full max-w-[1440px] bg-[#EFEFEF] py-8 sm:py-12 md:py-16 px-4 sm:px-8 md:px-12 flex justify-center"
-        >
-          <div className="w-full max-w-[1240px] grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-stretch">
-            {/* Left Card: Phone Mockup on Rock */}
-            <div
-              id="parcadolu-phone-card"
-              {...zoomable(() =>
-                setSelectedImage({
-                  src: ParcadoluMain2,
-                  title: "Parçadolu - Mobil Uygulama Arayüzü",
-                })
-              )}
-              className="w-full aspect-square bg-[#0E0B07] rounded-3xl sm:rounded-4xl md:rounded-[40px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 cursor-zoom-in flex items-center justify-center p-0"
-            >
-              <AnimatedImage
-                id="parcadolu-main2-image"
-                src={ParcadoluMain2}
-                alt="Parçadolu mobil uygulama tasarımı kaya üzerinde telefon mockup"
-                wrapperClassName="w-full h-full flex items-center justify-center"
-                className="w-full h-full object-cover select-none"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
-            {/* Right Card: 2x2 Auto Parts Line Icons */}
-            <div
-              id="parcadolu-icons-card"
-              className="w-full aspect-square bg-[#F7F7F7] rounded-3xl sm:rounded-4xl md:rounded-[40px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 p-8 sm:p-12 md:p-16 flex items-center justify-center"
-            >
-              <div className="w-full h-full max-w-[420px] max-h-[420px] grid grid-cols-2 gap-6 sm:gap-8 md:gap-10 place-items-center">
-                {/* Icon 1: Amortisör / Shock Absorber */}
-                <div
-                  {...zoomable(() =>
-                    setSelectedImage({
-                      src: ParcadoluMain3,
-                      title: "Parçadolu İkonografi - Amortisör",
-                    })
-                  )}
-                  className="w-full h-full flex items-center justify-center p-2 sm:p-4 hover:scale-110 transition-transform duration-300 cursor-zoom-in"
-                >
-                  <img
-                    src={ParcadoluMain3}
-                    alt="Amortisör oto parça ikonu"
-                    className="w-full h-full max-w-[140px] max-h-[140px] object-contain select-none"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Icon 2: Fren Diski / Brake Disc */}
-                <div
-                  {...zoomable(() =>
-                    setSelectedImage({
-                      src: ParcadoluMain4,
-                      title: "Parçadolu İkonografi - Fren Diski ve Balata",
-                    })
-                  )}
-                  className="w-full h-full flex items-center justify-center p-2 sm:p-4 hover:scale-110 transition-transform duration-300 cursor-zoom-in"
-                >
-                  <img
-                    src={ParcadoluMain4}
-                    alt="Fren diski ve balatası oto parça ikonu"
-                    className="w-full h-full max-w-[140px] max-h-[140px] object-contain select-none"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Icon 3: Filtre & Buji / Filter & Spark Plug */}
-                <div
-                  {...zoomable(() =>
-                    setSelectedImage({
-                      src: ParcadoluMain5,
-                      title: "Parçadolu İkonografi - Filtre ve Buji",
-                    })
-                  )}
-                  className="w-full h-full flex items-center justify-center p-2 sm:p-4 hover:scale-110 transition-transform duration-300 cursor-zoom-in"
-                >
-                  <img
-                    src={ParcadoluMain5}
-                    alt="Filtre, buji ve civata oto parça ikonu"
-                    className="w-full h-full max-w-[140px] max-h-[140px] object-contain select-none"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Icon 4: Pistonlar / Pistons */}
-                <div
-                  {...zoomable(() =>
-                    setSelectedImage({
-                      src: ParcadoluMain6,
-                      title: "Parçadolu İkonografi - Motor Pistonları",
-                    })
-                  )}
-                  className="w-full h-full flex items-center justify-center p-2 sm:p-4 hover:scale-110 transition-transform duration-300 cursor-zoom-in"
-                >
-                  <img
-                    src={ParcadoluMain6}
-                    alt="Motor pistonları oto parça ikonu"
-                    className="w-full h-full max-w-[140px] max-h-[140px] object-contain select-none"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 4: Angled Laptop on Black Podium with 'Premium AUTO PARTS' */}
-        <section
-          id="parcadolu-laptop-podium-section"
-          aria-label="Premium Auto Parts - Siyah Podyum Laptop Mockup"
-          {...zoomable(() =>
-            setSelectedImage({
-              src: ParcadoluMain7,
-              title: "Parçadolu - Premium Auto Parts Sunumu",
-            })
-          )}
-          className="w-full max-w-[1440px] flex justify-center bg-[#070502] cursor-zoom-in group"
-        >
-          <AnimatedImage
-            id="parcadolu-main7-image"
-            src={ParcadoluMain7}
-            alt="Parçadolu Premium AUTO PARTS siyah podyum üzerinde açılı laptop web sitesi mockup"
-            wrapperClassName="w-full max-w-[1440px]"
-            className="w-full h-auto object-cover select-none group-hover:scale-[1.01] transition-transform duration-500"
-            loading="lazy"
-            decoding="async"
-          />
-        </section>
-
-        {/* Section 5: Auto Parts Composite Grid & Social Links */}
-        <section
-          id="parcadolu-autoparts-grid-section"
-          aria-label="Oto Yedek Parça Görselleri ve Sosyal Medya Kompozisyonu"
-          {...zoomable(() =>
-            setSelectedImage({
-              src: ParcadoluMain8,
-              title: "Parçadolu - Oto Yedek Parça Ürün Kartları Kompozisyonu",
-            })
-          )}
-          className="w-full max-w-[1440px] -mt-8 sm:-mt-14 md:-mt-20 relative z-10 mb-16 sm:mb-20 flex justify-center cursor-zoom-in group"
-        >
-          <div className="w-full max-w-[1240px] px-4 sm:px-8 md:px-12 flex justify-center">
-            <AnimatedImage
-              id="parcadolu-main8-image"
-              src={ParcadoluMain8}
-              alt="Parçadolu buji, yağ tenekesi, filtreler, Black Friday fren balataları ve ampul ürün kartları"
-              wrapperClassName="w-full max-w-[1240px] flex justify-center"
-              className="w-full h-auto object-contain select-none group-hover:scale-[1.01] transition-transform duration-500"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        </section>
-
-        {/* Section 6: Large Rounded Card with Illuminated Neon 'pd' Wall Sign */}
-        <section
-          id="parcadolu-neon-sign-section"
-          aria-label="Parçadolu Işıklı Neon Tabela"
-          className="w-full max-w-[1440px] bg-white pb-16 sm:pb-24 px-4 sm:px-8 md:px-12 flex justify-center"
-        >
-          <div
-            id="parcadolu-neon-card"
-            {...zoomable(() =>
-              setSelectedImage({
-                src: ParcadoluMain9,
-                title: "Parçadolu - Işıklı Neon Duvar Tabelası",
-              })
-            )}
-            className="w-full max-w-[1240px] rounded-3xl sm:rounded-4xl md:rounded-[44px] overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-1.5 cursor-zoom-in bg-[#0D0304]"
-          >
-            <AnimatedImage
-              id="parcadolu-main9-image"
-              src={ParcadoluMain9}
-              alt="Parçadolu kırmızı ve gece mavisi duvara monte sarı neon ışıklı pd amblemi tabela sunumu"
-              wrapperClassName="w-full flex justify-center"
-              className="w-full h-auto object-cover select-none group-hover:scale-[1.01] transition-transform duration-500"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        </section>
-
-        {/* Section 7: Project Details & Agency Footer */}
         <ProjectCredits
           title="Parçadolu"
           description="Otomotiv yedek parça sektörü için geliştirilen modern e-ticaret web platformu, mobil uygulama arayüzü (UI/UX), 3D ikonografi, ürün fotoğrafçılığı ve kurumsal marka kimliği tasarımı."
