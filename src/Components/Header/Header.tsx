@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router";
+import { smoothScrollTo } from "@/Components/ScrollToTop";
+import ClickDesignStudio from "@/Resources/HomePage/ClickDesignStudio.svg";
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,17 +15,35 @@ export const Header = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const handleNavClick = (hashId?: string) => {
+    setIsOpen(false);
+    if (hashId) {
+      smoothScrollTo(hashId, { offset: 32, duration: 800 });
+    }
+  };
+
   return (
     <>
       {/* Header Alanı */}
-      <header className="relative z-50 h-20 px-4 flex justify-end items-center">
+      {/* lg+: Figma'da menü ikonu sağdan 32px, üstten 48px */}
+      <header className="relative z-50 h-16 sm:h-20 px-4 sm:px-8 md:px-12 lg:pl-20 lg:pr-6 flex justify-between items-center">
+        {/* Logo Sol */}
+        <Link
+          to="/"
+          className="cursor-pointer inline-flex items-center group"
+          aria-label="Click Design Studio Ana Sayfa"
+        >
+        </Link>
+
+        {/* 2 Çubuklu Hamburger Menü Butonu */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Menüyü kapat" : "Menüyü aç"}
           aria-expanded={isOpen}
-          className="p-2 cursor-pointer focus:outline-none"
+          className="p-2 cursor-pointer focus:outline-none lg:translate-y-[19px]"
         >
+          {/* Figma: 40px genişlik, 10px + 4px çubuk, aralarında 8px */}
           <svg
             width="40"
             height="22"
@@ -31,51 +52,34 @@ export const Header = () => {
             xmlns="http://www.w3.org/2000/svg"
             className="overflow-visible"
           >
-            {/* Çizgi 1: Merkeze inip +45° döner (Açıldığında beyaz olur) */}
+            {/* Çizgi 1 */}
             <rect
-              y="2"
+              y="0"
               width="40"
-              height="4"
+              height="10"
               fill={isOpen ? "#FFFFFF" : "#1A1A1A"}
-              className="menu-div1 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{
                 transformBox: "fill-box",
                 transformOrigin: "center",
                 transform: isOpen
-                  ? "translateY(8px) rotate(45deg)"
+                  ? "translateY(6px) rotate(45deg)"
                   : "translateY(0) rotate(0deg)",
               }}
             />
 
-            {/* Çizgi 2: Açıldığında giderek şeffaflaşır (opacity: 0) */}
-            <rect
-              y="10"
-              width="40"
-              height="4"
-              fill={isOpen ? "#FFFFFF" : "#1A1A1A"}
-              className="menu-div2 transition-all duration-200 ease-in-out"
-              style={{
-                transformBox: "fill-box",
-                transformOrigin: "center",
-                opacity: isOpen ? 0 : 1,
-                transform: isOpen
-                  ? "scaleX(0.7) translateX(-4px)"
-                  : "scaleX(1) translateX(0)",
-              }}
-            />
-
-            {/* Çizgi 3: Merkeze çıkıp -45° döner (Açıldığında beyaz olur) */}
+            {/* Çizgi 2 */}
             <rect
               y="18"
               width="40"
               height="4"
               fill={isOpen ? "#FFFFFF" : "#1A1A1A"}
-              className="menu-div3 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] mt-1"
               style={{
                 transformBox: "fill-box",
                 transformOrigin: "center",
                 transform: isOpen
-                  ? "translateY(-8px) rotate(-45deg)"
+                  ? "translateY(-9px) rotate(-45deg)"
                   : "translateY(0) rotate(0deg)",
               }}
             />
@@ -87,31 +91,40 @@ export const Header = () => {
       <div
         onClick={() => setIsOpen(false)}
         aria-hidden="true"
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300 ${
-          isOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300 ${isOpen
+          ? "opacity-100 pointer-events-auto"
+          : "opacity-0 pointer-events-none"
+          }`}
       />
 
       {/* Sağdan Açılan Koyu Menü Paneli */}
       <aside
-        className={`fixed top-0 right-0 z-40 h-full w-70 sm:w-[320px] bg-[#121212] text-white shadow-2xl flex flex-col justify-start pt-30 px-10 sm:px-12 py-12 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 z-40 h-full w-70 sm:w-[320px] bg-[#121212] text-white shadow-2xl flex flex-col justify-start pt-30 px-10 sm:px-12 py-12 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         {/* Menü Linkleri */}
         <nav className="flex flex-col space-y-6 sm:space-y-7">
-          {["Hakkımızda", "Projeler", "İletişim"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={() => setIsOpen(false)}
-              className="text-[22px] sm:text-[24px] font-normal tracking-[-0.01em] text-white hover:text-[#F21414] transition-colors cursor-pointer w-fit"
-            >
-              {item}
-            </a>
-          ))}
+          <Link
+            to="/#hakkimizda"
+            onClick={() => handleNavClick("hakkimizda")}
+            className="text-[22px] sm:text-[24px] font-normal tracking-[-0.01em] text-white hover:text-[#F21414] transition-colors cursor-pointer w-fit"
+          >
+            Hakkımızda
+          </Link>
+          <Link
+            to="/projects"
+            onClick={() => handleNavClick()}
+            className="text-[22px] sm:text-[24px] font-normal tracking-[-0.01em] text-white hover:text-[#F21414] transition-colors cursor-pointer w-fit"
+          >
+            Projeler
+          </Link>
+          <Link
+            to="/#contact"
+            onClick={() => handleNavClick("contact")}
+            className="text-[22px] sm:text-[24px] font-normal tracking-[-0.01em] text-white hover:text-[#F21414] transition-colors cursor-pointer w-fit"
+          >
+            İletişim
+          </Link>
         </nav>
 
         {/* Sosyal Medya İkonları */}

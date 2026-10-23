@@ -1,7 +1,60 @@
 import React, { useState } from "react";
 
+type FormFields = {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  projectDetails: string;
+};
+
+interface FieldProps {
+  id: string;
+  name: keyof FormFields;
+  label: string;
+  type?: string;
+  required?: boolean;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  labelClassName?: string;
+  className?: string;
+}
+
+// Figma: çizgi (#DEDEDE) alanın üstünde, etiket çizginin hemen altında (Montserrat 18px).
+// Odaklanınca / doluyken etiket çizginin üstüne küçülerek çıkar.
+const Field = ({
+  id,
+  name,
+  label,
+  type = "text",
+  required,
+  value,
+  onChange,
+  labelClassName = "text-black",
+  className = "",
+}: FieldProps) => (
+  <div className={`relative ${className}`}>
+    <input
+      type={type}
+      id={id}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder=" "
+      required={required}
+      className="peer w-full h-8 bg-transparent pt-[5px] pb-1 text-base lg:text-[18px] leading-normal text-black border-t border-[#DEDEDE] focus:border-black focus:outline-none transition-colors"
+    />
+    <label
+      htmlFor={id}
+      className={`pointer-events-none absolute left-0 top-[5px] text-base lg:text-[18px] leading-normal transition-all duration-200 ease-out peer-focus:-top-5 peer-focus:text-xs peer-[:not(:placeholder-shown)]:-top-5 peer-[:not(:placeholder-shown)]:text-xs ${labelClassName}`}
+    >
+      {label}
+    </label>
+  </div>
+);
+
 export const BrandProjectInquiry = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormFields>({
     name: "",
     company: "",
     email: "",
@@ -19,95 +72,63 @@ export const BrandProjectInquiry = () => {
   };
 
   return (
-    <section className="relative w-full overflow-hidden py-20 lg:py-32 font-sans selection:bg-red-600 selection:text-white">
-      <div className="relative z-10 mx-auto max-w-360 px-6 md:px-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-          {/* Sol Kolon: Başlık */}
-          <div className="lg:col-span-5 pt-8 lg:pt-14">
-            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-normal leading-[1.28] tracking-tight text-neutral-900">
-              Bir markayı oluşturmak
-              <br />
-              karmaşık olabilir,
-              <br />
-              işleri basitleştirelim.
-            </h2>
-          </div>
+    // lg+: Figma 1440 çerçevesindeki konumlar; yükseklik = kart (400px) + butonun alttan taşması (34px)
+    <section className="relative w-full pb-20 lg:pb-0 lg:mb-[166px] lg:h-[434px] font-montserrat selection:bg-red-600 selection:text-white">
+      {/* Başlık (Figma: Montserrat Regular 42px, kartın sol kenarına biner) */}
+      <h2 className="relative z-10 px-6 md:px-16 lg:px-0 lg:absolute lg:left-[106px] lg:top-[69px] text-3xl md:text-4xl lg:text-[42px] font-normal leading-normal text-black lg:whitespace-nowrap">
+        Bir markayı oluşturmak
+        <br />
+        karmaşık olabilir,
+        <br />
+        İşleri basitleştirelim.
+      </h2>
 
-          {/* Sağ Kolon: Gri Form Kartı */}
-          <div className="lg:col-span-7 relative">
-            <div className="relative bg-[#f8f9fa] p-8 md:p-14 lg:p-16 pb-20 md:pb-24">
-              <form onSubmit={handleSubmit} className="space-y-10">
-                {/* 1. Satır: İsim & Şirket */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10">
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="*İsim"
-                    required
-                    className="w-full bg-transparent pb-2.5 text-base text-neutral-900 border-b border-neutral-300 focus:outline-none transition-colors"
-                  />
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    placeholder="Şirket"
-                    className="w-full bg-transparent pb-2.5 text-base text-neutral-900 border-b border-neutral-300 focus:outline-none transition-colors"
-                  />
-                </div>
+      {/* Mobilde kartın içeriğini saran kutu; lg'de çocuklar section'a göre konumlanır */}
+      <div className="relative mt-10 mx-6 md:mx-16 px-8 md:px-14 pt-14 pb-24 lg:static lg:m-0 lg:p-0">
+        {/* Gri Kart (Figma: #F8F8F8, sayfanın sağ kenarına kadar uzanır) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[#F8F8F8] lg:inset-auto lg:left-[calc(33.33%+22px)] lg:right-0 lg:top-0 lg:h-[400px]"
+        />
 
-                {/* 2. Satır: E-Posta & Telefon (Kırmızı Vurgulu) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="*E-Posta"
-                    required
-                    className="w-full bg-transparent pb-2.5 text-base text-neutral-900 border-b border-neutral-300 focus:outline-none transition-colors"
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="*Telefon"
-                    required
-                    className="w-full bg-transparent pb-2.5 text-base text-neutral-900 border-b border-neutral-300 focus:outline-none transition-colors"
-                  />
-                </div>
+        <form
+          id="brand-inquiry-form"
+          onSubmit={handleSubmit}
+          className="relative grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-10 lg:absolute lg:left-[calc(50%+50px)] lg:top-[95px] lg:w-[500px] lg:grid-cols-[228px_228px] lg:gap-x-[44px] lg:gap-y-[26px]"
+        >
+          <Field id="form-name" name="name" label="*İsim" required value={formData.name} onChange={handleChange} />
+          <Field id="form-company" name="company" label="Şirket" value={formData.company} onChange={handleChange} />
+          <Field id="form-email" name="email" type="email" label="*E-Posta" required value={formData.email} onChange={handleChange} />
+          <Field
+            id="form-phone"
+            name="phone"
+            type="tel"
+            label="*Telefon"
+            required
+            value={formData.phone}
+            onChange={handleChange}
+            labelClassName="text-[#F21414]"
+          />
+          <Field
+            id="form-projectDetails"
+            name="projectDetails"
+            label="Projeniz Hakkında Kısa Bilgi Verin"
+            value={formData.projectDetails}
+            onChange={handleChange}
+            className="sm:col-span-2 lg:mt-[15px]"
+          />
+        </form>
 
-                {/* 3. Satır: Proje Detayı */}
-                <div>
-                  <input
-                    type="text"
-                    name="projectDetails"
-                    value={formData.projectDetails}
-                    onChange={handleChange}
-                    placeholder="Projeniz Hakkında Kısa Bilgi Verin"
-                    className="w-full bg-transparent pb-2.5 text-base text-neutral-900 border-b border-neutral-300 focus:outline-none transition-colors"
-                  />
-                </div>
-
-                {/* Kırmızı Kare Vurgu ve "Proje Başlat" Butonu */}
-                <div className="absolute left-8 sm:left-12 -bottom-7 sm:-bottom-8 flex flex-col items-start">
-                  {/* Sol üstteki mimari kırmızı kare */}
-                  <div className="w-4.5 h-4.5 bg-[#e51921] -mb-px -ml-4.5" />
-
-                  {/* Buton */}
-                  <button
-                    type="submit"
-                    className="px-10 sm:px-14 py-3.5 sm:py-4 bg-[#e51921] text-white text-base sm:text-lg font-normal tracking-wide hover:brightness-110 active:brightness-95 transition-all shadow-sm cursor-pointer"
-                  >
-                    Proje Başlat
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+        {/* "Proje Başlat" Butonu (Figma: 265×62, Montserrat 30px) ve sol üstündeki 20px kırmızı kare */}
+        <div className="absolute left-12 -bottom-7 lg:left-[calc(41.67%+10px)] lg:bottom-auto lg:top-[372px]">
+          <div className="absolute -top-4 -left-4 w-4 h-4 lg:-top-5 lg:-left-5 lg:w-5 lg:h-5 bg-[#F21414]" />
+          <button
+            type="submit"
+            form="brand-inquiry-form"
+            className="px-10 sm:px-14 py-3 sm:py-3.5 lg:p-0 lg:w-[265px] lg:h-[62px] bg-[#F21414] text-white text-lg lg:text-[30px] font-normal leading-normal hover:brightness-110 active:brightness-95 transition-all cursor-pointer"
+          >
+            Proje Başlat
+          </button>
         </div>
       </div>
     </section>

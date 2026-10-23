@@ -54,12 +54,64 @@ export const RibbonMarquee: React.FC<RibbonMarqueeProps> = ({
   selectedBandId = null,
   onSelectBand,
 }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = React.useState<number | null>(null);
+
   const bgConfig = CANVAS_BG_CLASSES[canvasBg];
   const activeBands = bands.filter((b) => b.enabled && b.items.length > 0);
 
+  // Re-calculate the exact height needed so the bottom-most band tip meets the bottom edge
+  React.useEffect(() => {
+    const updateHeight = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      const width = container.clientWidth || window.innerWidth;
+
+      // Band height depending on Tailwind responsive breakpoints:
+      // h-16 (64px) < 640px, sm:h-20 (80px) < 768px, md:h-22 (88px) < 1024px, lg:h-30 (120px) >= 1024px
+      const bandHeight = width < 640 ? 64 : width < 768 ? 80 : width < 1024 ? 88 : 120;
+
+      let maxRequiredHeight = 0;
+
+      activeBands.forEach((band) => {
+        // Parse angle in degrees
+        const angleMatch = band.angle.match(/([+-]?\d+(?:\.\d+)?)/);
+        const angleDeg = angleMatch ? Math.abs(parseFloat(angleMatch[1])) : 0;
+        const theta = (angleDeg * Math.PI) / 180;
+
+        // Parse vertical position percentage
+        const posMatch = band.verticalPos.match(/(\d+(?:\.\d+)?)/);
+        const p = posMatch ? parseFloat(posMatch[1]) / 100 : 0.5;
+
+        // The lowest point of the angled band on screen [0, width] occurs at the edge:
+        // y_bottom = p * H + (width / 2) * tan(theta) + (bandHeight / 2) / cos(theta)
+        // Solving for H where H == y_bottom:
+        // H = ((width / 2) * tan(theta) + (bandHeight / 2) / cos(theta)) / (1 - p)
+        if (1 - p > 0.05) {
+          const requiredH =
+            ((width / 2) * Math.tan(theta) + (bandHeight / 2) / Math.cos(theta)) /
+            (1 - p);
+          if (requiredH > maxRequiredHeight) {
+            maxRequiredHeight = requiredH;
+          }
+        }
+      });
+
+      if (maxRequiredHeight > 0) {
+        setContainerHeight(Math.ceil(maxRequiredHeight));
+      }
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, [activeBands]);
+
   return (
     <div
-      className={`relative w-full h-80 sm:h-96 md:h-150 overflow-hidden select-none transition-colors duration-200 ${bgConfig.wrapper}`}
+      ref={containerRef}
+      className={`relative w-full overflow-hidden select-none transition-colors duration-200 ${bgConfig.wrapper}`}
+      style={containerHeight ? { height: `${containerHeight}px` } : undefined}
       role="region"
       aria-label="Kinetik Kesişen Yazı Bantları"
     >
@@ -119,7 +171,7 @@ export const RibbonMarquee: React.FC<RibbonMarqueeProps> = ({
             onClick={() => onSelectBand && onSelectBand(band.id)}
             className={`
               group absolute left-[-30%] w-[160%] -translate-y-1/2 origin-center
-              h-16 sm:h-20 md:h-22 flex items-center
+              h-16 sm:h-20 md:h-22 lg:h-30 flex items-center
               transition-transform duration-200
               ${verticalPosClass}
               ${angleClass}
@@ -159,7 +211,7 @@ export const RibbonMarquee: React.FC<RibbonMarqueeProps> = ({
                           {item.text}
                         </span>
                         <span
-                          className={`inline-block w-[1.5px] h-10 sm:h-12 md:h-14 shrink-0 ${colorMeta.dividerClass}`}
+                          className={`inline-block w-[1.5px] h-10 sm:h-12 md:h-14 lg:h-24 shrink-0 ${colorMeta.dividerClass}`}
                           aria-hidden="true"
                         />
                       </React.Fragment>
